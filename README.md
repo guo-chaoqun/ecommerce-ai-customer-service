@@ -219,6 +219,7 @@ ecommerce-ai-customer-service/
 - 郭超群
 - 邮箱：168314684@qq.com
 - 求职意向：AI 产品经理 / 产品策划（实习）
+- 📄 完整作品集：[AI 产品经理作品集 · 飞书文档](https://xcnaaqfol96z.feishu.cn/docx/UDmldSWS2oKykaxUrUOcojobnwl)
 
 ---
 
