@@ -151,6 +151,7 @@ ecommerce-ai-customer-service/
    - 输出层：[eval_runs/](eval_runs) 每个版本目录里有逐条打分 JSON/CSV 与失败用例清单
    - 复评基准：[08_baseline_v2_rerun_v44.ipynb](analysis/notebooks/08_baseline_v2_rerun_v44.ipynb) + [baseline_v2_v44/](eval_runs/baseline_v2_v44)
    - 分析层：[03_failure_attribution.ipynb](analysis/notebooks/03_failure_attribution.ipynb)（8 类根因怎么归出来的）
+   - 统计验证：[09_mcnemar_test.py](analysis/09_mcnemar_test.py)（V2 复评 vs V3 配对 McNemar 检验，运行即输出 b=23 / c=9 / p=0.0201）
 
 **用例字段速查**：`case_id`（跨版本追踪）、`input`（用户输入）、`expected_branch`（期望路由）、`must_not`（禁止出现的内容，触发即违规）、`expected_points`（必须覆盖的要点）、`difficulty`（简单/中等/困难）、`test_type`（5 类之一）等 17 个字段。
 
