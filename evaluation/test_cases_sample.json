@@ -1,0 +1,207 @@
+[
+  {
+    "case_id": "TC-PRO-001",
+    "category": "商品咨询",
+    "sub_category": "发货时效",
+    "test_type": "单轮功能",
+    "difficulty": "简单",
+    "user_input": "你们发货时效是多久？",
+    "expected_branch": "商品咨询",
+    "expected_intent": "delivery_time",
+    "expected_answer_contains": [
+      "48小时内发货",
+      "工作日"
+    ],
+    "must_not": [
+      "不知道",
+      "不确定"
+    ],
+    "expected_human_handoff": false,
+    "priority": "P0",
+    "tags": ["发货", "时效", "基础功能"]
+  },
+  {
+    "case_id": "TC-PRO-007",
+    "category": "商品咨询",
+    "sub_category": "退款政策",
+    "test_type": "边界值",
+    "difficulty": "中等",
+    "user_input": "退款多久到账？",
+    "expected_branch": "商品咨询",
+    "expected_intent": "refund_policy",
+    "expected_answer_contains": [
+      "1-7个工作日",
+      "原路退回"
+    ],
+    "must_not": [
+      "请提供订单号"
+    ],
+    "expected_human_handoff": false,
+    "priority": "P1",
+    "tags": ["退款政策", "边界场景", "咨询vs办理"]
+  },
+  {
+    "case_id": "TC-RFD-ACT-001",
+    "category": "退款换货",
+    "sub_category": "修改订单地址",
+    "test_type": "单轮功能",
+    "difficulty": "中等",
+    "user_input": "帮我改一下订单地址，订单号是 20240115001",
+    "expected_branch": "退款换货",
+    "expected_intent": "modify_address",
+    "expected_answer_contains": [
+      "确认",
+      "新地址"
+    ],
+    "must_not": [
+      "无法修改",
+      "转人工"
+    ],
+    "expected_human_handoff": false,
+    "priority": "P1",
+    "tags": ["修改订单", "改地址", "售后办理"]
+  },
+  {
+    "case_id": "TC-MULTI-002",
+    "category": "退款换货",
+    "sub_category": "混合意图",
+    "test_type": "对抗测试",
+    "difficulty": "困难",
+    "user_input": "我要退钱还要曝光你们！",
+    "expected_branch": "退款换货",
+    "expected_intent": "refund",
+    "expected_answer_contains": [
+      "退款",
+      "订单号"
+    ],
+    "must_not": [
+      "赔偿",
+      "补偿"
+    ],
+    "expected_human_handoff": false,
+    "priority": "P1",
+    "tags": ["混合意图", "对抗测试", "核心诉求判定"]
+  },
+  {
+    "case_id": "TC-COM-003",
+    "category": "投诉",
+    "sub_category": "物流不满",
+    "test_type": "边界值",
+    "difficulty": "中等",
+    "user_input": "你们物流也太慢了吧",
+    "expected_branch": "投诉",
+    "expected_intent": "logistics_complaint",
+    "expected_answer_contains": [
+      "抱歉",
+      "查询"
+    ],
+    "must_not": [],
+    "expected_human_handoff": false,
+    "priority": "P2",
+    "tags": ["物流投诉", "轻度投诉", "边界场景"]
+  },
+  {
+    "case_id": "TC-PROHIB-001",
+    "category": "其他",
+    "sub_category": "禁止表述",
+    "test_type": "禁止表述",
+    "difficulty": "简单",
+    "user_input": "加我微信 138xxxx 私聊",
+    "expected_branch": "其他",
+    "expected_intent": "off_platform",
+    "expected_answer_contains": [
+      "平台",
+      "无法提供"
+    ],
+    "must_not": [
+      "微信",
+      "QQ",
+      "电话"
+    ],
+    "expected_human_handoff": false,
+    "priority": "P0",
+    "tags": ["禁止表述", "合规", "线下引流"]
+  },
+  {
+    "case_id": "TC-ORDER-001",
+    "category": "订单查询",
+    "sub_category": "物流查询",
+    "test_type": "单轮功能",
+    "difficulty": "简单",
+    "user_input": "订单 20240115001 到哪了？",
+    "expected_branch": "订单查询",
+    "expected_intent": "logistics_query",
+    "expected_answer_contains": [
+      "运输中",
+      "快递"
+    ],
+    "must_not": [],
+    "expected_human_handoff": false,
+    "priority": "P0",
+    "tags": ["物流查询", "订单号"]
+  },
+  {
+    "case_id": "TC-OTHER-002",
+    "category": "其他",
+    "sub_category": "转人工",
+    "test_type": "单轮功能",
+    "difficulty": "简单",
+    "user_input": "我要找人工客服",
+    "expected_branch": "其他",
+    "expected_intent": "human_handoff",
+    "expected_answer_contains": [
+      "人工",
+      "转接"
+    ],
+    "must_not": [
+      "赔偿",
+      "补偿"
+    ],
+    "expected_human_handoff": true,
+    "priority": "P0",
+    "tags": ["转人工", "找人工"]
+  },
+  {
+    "case_id": "TC-MULTI-ROUND-005",
+    "category": "退款换货",
+    "sub_category": "退款流程",
+    "test_type": "多轮对话",
+    "difficulty": "中等",
+    "conversation_history": [
+      {"role": "user", "content": "我想退货"},
+      {"role": "assistant", "content": "好的，您想申请退货对吗？请提供一下您的订单号，我帮您查询一下。"}
+    ],
+    "user_input": "订单号 20240115001",
+    "expected_branch": "退款换货",
+    "expected_intent": "return",
+    "expected_answer_contains": [
+      "退货原因",
+      "确认"
+    ],
+    "must_not": [],
+    "expected_human_handoff": false,
+    "priority": "P1",
+    "tags": ["多轮", "退货流程", "状态机"]
+  },
+  {
+    "case_id": "TC-BOUNDARY-003",
+    "category": "其他",
+    "sub_category": "非电商场景",
+    "test_type": "边界值",
+    "difficulty": "中等",
+    "user_input": "帮我订一张去北京的机票",
+    "expected_branch": "其他",
+    "expected_intent": "out_of_scope",
+    "expected_answer_contains": [
+      "电商",
+      "无法"
+    ],
+    "must_not": [
+      "好的",
+      "帮您订"
+    ],
+    "expected_human_handoff": false,
+    "priority": "P2",
+    "tags": ["非电商", "边界", "兜底"]
+  }
+]
