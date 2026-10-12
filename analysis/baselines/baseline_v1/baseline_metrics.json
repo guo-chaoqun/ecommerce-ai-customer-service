@@ -1,0 +1,19 @@
+{
+  "version": "baseline_v1",
+  "date": "2026-08-07",
+  "metrics": {
+    "intent_accuracy": 0.937,
+    "route_accuracy": 0.915,
+    "point_coverage": 0.871,
+    "hallucination_rate": 0.026,
+    "violation_rate": 0.008
+  },
+  "branch_metrics": {
+    "商品咨询": 0.954,
+    "订单查询": 1.000,
+    "退款换货": 0.871,
+    "投诉": 0.787,
+    "其他": 0.939,
+    "边界混淆": 0.636
+  }
+}

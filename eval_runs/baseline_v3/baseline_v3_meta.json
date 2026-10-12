@@ -1,0 +1,33 @@
+{
+  "baseline_id": "baseline_v3",
+  "baseline_name": "P2硬性路由修复后回归评测",
+  "created_at": "2026-08-15 20:55:57",
+  "judge_model": "qwen-plus",
+  "eval_set": "eval_set_v4.json",
+  "failed_cases_source": "V1∪V2 union",
+  "results": {
+    "total_cases": 43,
+    "passed_cases": 43,
+    "failed_cases": 0,
+    "pass_rate": 1.0,
+    "fix_rate": 1.0,
+    "fixed_count": 43,
+    "not_fixed_count": 0
+  },
+  "metrics": {
+    "overall": {
+      "route_accuracy": 1.0,
+      "intent_accuracy": 4.883720930232558,
+      "point_coverage": 4.976744186046512,
+      "hallucination_rate": 0.0,
+      "violation_rate": 0.0,
+      "avg_intent_score": 4.883720930232558,
+      "avg_route_score": 5.0,
+      "avg_relevance_score": 4.976744186046512,
+      "avg_completeness_score": 4.837209302325581,
+      "avg_faithfulness_score": 5.0,
+      "avg_tone_score": 5.0,
+      "avg_boundary_score": 4.6976744186046515
+    }
+  }
+}

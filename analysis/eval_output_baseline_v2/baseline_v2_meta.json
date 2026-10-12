@@ -1,0 +1,132 @@
+{
+  "baseline_id": "baseline_v2",
+  "baseline_name": "P1优化后评测",
+  "created_at": "2026-08-12T18:13:58+08:00",
+  "description": "P1优化后全量评测，对比 baseline_v1 验证优化效果",
+  "p1_optimizations": [
+    {
+      "id": "P1-1",
+      "desc": "知识检索 score_threshold 降至 0.5（政策类查询）",
+      "config": "score_threshold=0.5"
+    },
+    {
+      "id": "P1-2",
+      "desc": "关键词权重提升至 0.5，向量权重降至 0.5",
+      "config": "keyword_weight=0.5, vector_weight=0.5"
+    },
+    {
+      "id": "P1-3",
+      "desc": "Top K 从 3 调整为 5",
+      "config": "top_k=5"
+    },
+    {
+      "id": "P1-4",
+      "desc": "LLM 提示词增加信息完整性约束",
+      "config": "prompt追加信息覆盖要求"
+    },
+    {
+      "id": "P1-5",
+      "desc": "添加防护指令（防幻觉）",
+      "config": "prompt追加无相关信息兜底"
+    }
+  ],
+  "eval_set": {
+    "name": "eval_set_v4",
+    "version": "4.0",
+    "total_cases": 505
+  },
+  "results": {
+    "total_cases": 505,
+    "passed_cases": 465,
+    "failed_cases_count": 40,
+    "pass_rate": 92.1,
+    "standardized_json": "eval_output_baseline_v2/eval_results_baseline_v2.json",
+    "standardized_csv": "eval_output_baseline_v2/eval_results_baseline_v2.csv"
+  },
+  "metrics": {
+    "overall": {
+      "intent_accuracy": 0.947,
+      "route_accuracy": 0.921,
+      "point_coverage": 0.867,
+      "hallucination_rate": 0.03,
+      "violation_rate": 0.016,
+      "avg_intent_score": 4.84,
+      "avg_route_score": 4.7,
+      "avg_relevance_score": 4.71,
+      "avg_completeness_score": 4.35,
+      "avg_faithfulness_score": 4.87,
+      "avg_tone_score": 4.96,
+      "avg_boundary_score": 4.8
+    },
+    "by_branch": {
+      "商品咨询": {
+        "pass_rate": 0.936,
+        "total": 281,
+        "passed": 263,
+        "failed": 18
+      },
+      "订单查询": {
+        "pass_rate": 0.972,
+        "total": 36,
+        "passed": 35,
+        "failed": 1
+      },
+      "退款换货": {
+        "pass_rate": 0.914,
+        "total": 70,
+        "passed": 64,
+        "failed": 6
+      },
+      "投诉": {
+        "pass_rate": 0.83,
+        "total": 47,
+        "passed": 39,
+        "failed": 8
+      },
+      "其他": {
+        "pass_rate": 0.959,
+        "total": 49,
+        "passed": 47,
+        "failed": 2
+      },
+      "边界混淆": {
+        "pass_rate": 0.773,
+        "total": 22,
+        "passed": 17,
+        "failed": 5
+      }
+    },
+    "by_test_type": {
+      "single_turn": {
+        "pass_rate": 0.942,
+        "total": 382,
+        "failed": 22
+      },
+      "multi_turn": {
+        "pass_rate": 0.824,
+        "total": 17,
+        "failed": 3
+      },
+      "boundary": {
+        "pass_rate": 0.886,
+        "total": 35,
+        "failed": 4
+      },
+      "prohibited": {
+        "pass_rate": 0.783,
+        "total": 23,
+        "failed": 5
+      },
+      "adversarial": {
+        "pass_rate": 0.875,
+        "total": 48,
+        "failed": 6
+      }
+    }
+  },
+  "judge_model": {
+    "model": "qwen-plus",
+    "temperature": 0,
+    "response_format": "json_object"
+  }
+}

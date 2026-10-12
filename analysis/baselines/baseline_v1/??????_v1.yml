@@ -1,0 +1,3581 @@
+app:
+  description: ''
+  icon: 🤖
+  icon_background: '#D1E9FF'
+  icon_type: emoji
+  mode: advanced-chat
+  name: 电商客服助手
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/ollama:1.0.0@ae50a2db261bffa7289677f2b0a60e60762ceb187b602113b72425ccbe772dc3
+    version: null
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/tongyi:0.2.5@9aab60635ffd74818b2537320771b0ae8ef49db2a13557ff76e18ae5669df038
+    version: null
+kind: app
+version: 0.6.0
+workflow:
+  conversation_variables:
+  - description: 标记"其他"分支的状态机当前进度
+    id: 7d4bfab4-c6c9-467c-a70c-154158cb7341
+    name: other_step
+    selector:
+    - conversation
+    - other_step
+    value: ''
+    value_type: string
+  - description: 下一轮对话的上下文承接
+    id: 4d0c90aa-2f91-4e1e-a9b6-6f05981c35e3
+    name: last_query
+    selector:
+    - conversation
+    - last_query
+    value: ''
+    value_type: string
+  - description: 建立投诉状态机
+    id: 5652e3aa-e397-4c35-a28a-1c257066dce2
+    name: complaint_step
+    selector:
+    - conversation
+    - complaint_step
+    value: initial
+    value_type: string
+  - description: 投诉类型，枚举值：物流问题/质量问题/服务态度/虚假宣传/安全问题/其他
+    id: b31e8dfb-4e21-476c-a3ee-d4a462731390
+    name: complaint_type
+    selector:
+    - conversation
+    - complaint_type
+    value: ''
+    value_type: string
+  - description: 用于记录退款流程当前步骤（状态机）
+    id: 94845b7b-720d-4fa8-ad46-10403a6c7acd
+    name: refund_step
+    selector:
+    - conversation
+    - refund_step
+    value: initial
+    value_type: string
+  - description: 用于记录退货退款的理由
+    id: d084d0be-c6f2-4b74-83d2-cb5a1b532cf2
+    name: refund_reason
+    selector:
+    - conversation
+    - refund_reason
+    value: ''
+    value_type: string
+  - description: 用于记录退款退货商品的id
+    id: c12bb1f2-2ff2-4a1b-bf74-04294a5859f8
+    name: refund_order_id
+    selector:
+    - conversation
+    - refund_order_id
+    value: ''
+    value_type: string
+  - description: 用来组建检索知识库/数据库的查询文本
+    id: 66375d31-0440-4d78-b7c9-8278644b4c95
+    name: retrieval_query
+    selector:
+    - conversation
+    - retrieval_query
+    value: ''
+    value_type: string
+  - description: 用于记录用户具体想了解商品的哪个维度（如续航、颜色、材质等），方便后续拼接检索词。
+    id: e818b44e-4281-4907-ba64-c2691de12ebb
+    name: current_dimension
+    selector:
+    - conversation
+    - current_dimension
+    value: ''
+    value_type: string
+  - description: 用于记录用户当前问的是哪款商品
+    id: 595a22d5-1ee5-47df-be6a-f1fca926f395
+    name: current_product
+    selector:
+    - conversation
+    - current_product
+    value: ''
+    value_type: string
+  - description: 对话轮数计数，用于判断转人工
+    id: 9e2f3b02-e23a-4f20-9397-6d3942a693c4
+    name: turn_count
+    selector:
+    - conversation
+    - turn_count
+    value: 0
+    value_type: integer
+  - description: 暂存用户提供的订单号
+    id: acca8b0a-835c-4c18-bea8-780e7886af27
+    name: order_id
+    selector:
+    - conversation
+    - order_id
+    value: ''
+    value_type: string
+  - description: 记录当前意图（商品咨询/物流查询/...）
+    id: 79fd1da8-5ab4-4565-ada7-4afca4e68afe
+    name: current_intent
+    selector:
+    - conversation
+    - current_intent
+    value: ''
+    value_type: string
+  - description: 存储对话历史，实现多轮记忆
+    id: e0580646-5e63-4c3e-94ca-3dbeab2aeb5c
+    name: conversation_history
+    selector:
+    - conversation
+    - conversation_history
+    value: []
+    value_type: array[object]
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        attachment_image_file_size_limit: 2
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        file_upload_limit: 20
+        image_file_batch_limit: 10
+        image_file_size_limit: 10
+        single_chunk_attachment_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: true
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: question-classifier
+      id: 1784975306138-source-1784979242299-target
+      selected: false
+      source: '1784975306138'
+      sourceHandle: source
+      target: '1784979242299'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1784979242299-2-1785053244582-target
+      selected: false
+      source: '1784979242299'
+      sourceHandle: '2'
+      target: '1785053244582'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: assigner
+      id: 1785053244582-source-1785053445270-target
+      selected: false
+      source: '1785053244582'
+      sourceHandle: source
+      target: '1785053445270'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1785053488379-source-1785053672798-target
+      selected: false
+      source: '1785053488379'
+      sourceHandle: source
+      target: '1785053672798'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1785054055027-true-1785053488379-target
+      selected: false
+      source: '1785054055027'
+      sourceHandle: 'true'
+      target: '1785053488379'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1785054055027-false-1785054146137-target
+      selected: false
+      source: '1785054055027'
+      sourceHandle: 'false'
+      target: '1785054146137'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1785053488379-fail-branch-1785054538156-target
+      selected: false
+      source: '1785053488379'
+      sourceHandle: fail-branch
+      target: '1785054538156'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785054538156-source-1785066533456-target
+      selected: false
+      source: '1785054538156'
+      sourceHandle: source
+      target: '1785066533456'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1785066533456-source-1785064423301-target
+      selected: false
+      source: '1785066533456'
+      sourceHandle: source
+      target: '1785064423301'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785053672798-source-1785066533456-target
+      selected: false
+      source: '1785053672798'
+      sourceHandle: source
+      target: '1785066533456'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785064423301-source-1785134888171-target
+      selected: false
+      source: '1785064423301'
+      sourceHandle: source
+      target: '1785134888171'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1785134888171-true-1785136009105-target
+      selected: false
+      source: '1785134888171'
+      sourceHandle: 'true'
+      target: '1785136009105'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1785134888171-false-1785136051661-target
+      selected: false
+      source: '1785134888171'
+      sourceHandle: 'false'
+      target: '1785136051661'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1784979242299-1-1785151051500-target
+      selected: false
+      source: '1784979242299'
+      sourceHandle: '1'
+      target: '1785151051500'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: assigner
+      id: 1785151051500-source-1785152632360-target
+      selected: false
+      source: '1785151051500'
+      sourceHandle: source
+      target: '1785152632360'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: template-transform
+      id: 1785152632360-source-1785154209566-target
+      selected: false
+      source: '1785152632360'
+      sourceHandle: source
+      target: '1785154209566'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: template-transform
+        targetType: knowledge-retrieval
+      id: 1785154209566-source-1785153347805-target
+      selected: false
+      source: '1785154209566'
+      sourceHandle: source
+      target: '1785153347805'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: knowledge-retrieval
+        targetType: if-else
+      id: 1785153347805-source-1785154435162-target
+      selected: false
+      source: '1785153347805'
+      sourceHandle: source
+      target: '1785154435162'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1785154435162-true-1785154507610-target
+      selected: false
+      source: '1785154435162'
+      sourceHandle: 'true'
+      target: '1785154507610'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1785154435162-false-1785063021374-target
+      selected: false
+      source: '1785154435162'
+      sourceHandle: 'false'
+      target: '1785063021374'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785154507610-source-17851570561020-target
+      selected: false
+      source: '1785154507610'
+      sourceHandle: source
+      target: '17851570561020'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785063021374-source-17851570561020-target
+      selected: false
+      source: '1785063021374'
+      sourceHandle: source
+      target: '17851570561020'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 17851570561020-source-1785221577631-target
+      selected: false
+      source: '17851570561020'
+      sourceHandle: source
+      target: '1785221577631'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785221577631-source-1785134888171-target
+      selected: false
+      source: '1785221577631'
+      sourceHandle: source
+      target: '1785134888171'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1784979242299-1784981904862-1785225696625-target
+      selected: false
+      source: '1784979242299'
+      sourceHandle: '1784981904862'
+      target: '1785225696625'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: assigner
+      id: 1785225696625-source-1785226071666-target
+      selected: false
+      source: '1785225696625'
+      sourceHandle: source
+      target: '1785226071666'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785226071666-source-1785226908015-target
+      selected: false
+      source: '1785226071666'
+      sourceHandle: source
+      target: '1785226908015'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: http-request
+      id: 1785226908015-true-1785226986121-target
+      selected: false
+      source: '1785226908015'
+      sourceHandle: 'true'
+      target: '1785226986121'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1785226908015-false-1785226992270-target
+      selected: false
+      source: '1785226908015'
+      sourceHandle: 'false'
+      target: '1785226992270'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: answer
+      id: 1785226992270-source-1785227114986-target
+      selected: false
+      source: '1785226992270'
+      sourceHandle: source
+      target: '1785227114986'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: code
+      id: 1785226986121-source-1785227742518-target
+      selected: false
+      source: '1785226986121'
+      sourceHandle: source
+      target: '1785227742518'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: http-request
+        targetType: llm
+      id: 1785226986121-fail-branch-1785227831607-target
+      selected: false
+      source: '1785226986121'
+      sourceHandle: fail-branch
+      target: '1785227831607'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: if-else
+      id: 1785227742518-source-1785228219759-target
+      selected: false
+      source: '1785227742518'
+      sourceHandle: source
+      target: '1785228219759'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1785228219759-true-1785227857167-target
+      selected: false
+      source: '1785228219759'
+      sourceHandle: 'true'
+      target: '1785227857167'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1785228219759-false-1785228477308-target
+      selected: false
+      source: '1785228219759'
+      sourceHandle: 'false'
+      target: '1785228477308'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785227857167-source-1785228866975-target
+      selected: false
+      source: '1785227857167'
+      sourceHandle: source
+      target: '1785228866975'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785228477308-source-1785228866975-target
+      selected: false
+      source: '1785228477308'
+      sourceHandle: source
+      target: '1785228866975'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785227831607-source-1785228866975-target
+      selected: false
+      source: '1785227831607'
+      sourceHandle: source
+      target: '1785228866975'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1785228866975-source-1785229253605-target
+      selected: false
+      source: '1785228866975'
+      sourceHandle: source
+      target: '1785229253605'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785229253605-source-1785134888171-target
+      selected: false
+      source: '1785229253605'
+      sourceHandle: source
+      target: '1785134888171'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: parameter-extractor
+      id: 1784979242299-1784981917529-1785232499754-target
+      selected: false
+      source: '1784979242299'
+      sourceHandle: '1784981917529'
+      target: '1785232499754'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: parameter-extractor
+        targetType: assigner
+      id: 1785232499754-source-1785232770582-target
+      selected: false
+      source: '1785232499754'
+      sourceHandle: source
+      target: '1785232770582'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: llm
+      id: 1785232770582-source-1785232938190-target
+      selected: false
+      source: '1785232770582'
+      sourceHandle: source
+      target: '1785232938190'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: if-else
+      id: 1785232938190-source-1785233726777-target
+      selected: false
+      source: '1785232938190'
+      sourceHandle: source
+      target: '1785233726777'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: llm
+      id: 1785233726777-true-1785233831833-target
+      selected: false
+      source: '1785233726777'
+      sourceHandle: 'true'
+      target: '1785233831833'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785233831833-source-1785234111201-target
+      selected: false
+      source: '1785233831833'
+      sourceHandle: source
+      target: '1785234111201'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785233833796-source-1785234111201-target
+      selected: false
+      source: '1785233833796'
+      sourceHandle: source
+      target: '1785234111201'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1785234111201-source-1785234351741-target
+      selected: false
+      source: '1785234111201'
+      sourceHandle: source
+      target: '1785234351741'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785234351741-source-1785236540125-target
+      selected: false
+      source: '1785234351741'
+      sourceHandle: source
+      target: '1785236540125'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1785236540125-false-1785236633502-target
+      selected: false
+      source: '1785236540125'
+      sourceHandle: 'false'
+      target: '1785236633502'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: if-else
+        targetType: if-else
+      id: 1785236540125-true-1785134888171-target
+      selected: false
+      source: '1785236540125'
+      sourceHandle: 'true'
+      target: '1785134888171'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: question-classifier
+        targetType: assigner
+      id: 1784979242299-1784981930016-1785237941740-target
+      selected: false
+      source: '1784979242299'
+      sourceHandle: '1784981930016'
+      target: '1785237941740'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: llm
+      id: 1785237941740-source-1785237879861-target
+      selected: false
+      source: '1785237941740'
+      sourceHandle: source
+      target: '1785237879861'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: llm
+        targetType: code
+      id: 1785237879861-source-1785305368919-target
+      selected: false
+      source: '1785237879861'
+      sourceHandle: source
+      target: '1785305368919'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: assigner
+      id: 1785305368919-source-1785305442325-target
+      selected: false
+      source: '1785305368919'
+      sourceHandle: source
+      target: '1785305442325'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785305442325-source-1785306285279-target
+      selected: false
+      source: '1785305442325'
+      sourceHandle: source
+      target: '1785306285279'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1785306285279-true-1785306409615-target
+      selected: false
+      source: '1785306285279'
+      sourceHandle: 'true'
+      target: '1785306409615'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: answer
+      id: 1785306285279-false-1785306438868-target
+      selected: false
+      source: '1785306285279'
+      sourceHandle: 'false'
+      target: '1785306438868'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: assigner
+        targetType: if-else
+      id: 1785053445270-source-1785054055027-target
+      selected: false
+      source: '1785053445270'
+      sourceHandle: source
+      target: '1785054055027'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: if-else
+        targetType: code
+      id: 1785233726777-false-1785667350728-target
+      selected: false
+      source: '1785233726777'
+      sourceHandle: 'false'
+      target: '1785667350728'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        isInLoop: false
+        sourceType: code
+        targetType: llm
+      id: 1785667350728-source-1785233833796-target
+      selected: false
+      source: '1785667350728'
+      sourceHandle: source
+      target: '1785233833796'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInLoop: false
+        sourceType: start
+        targetType: llm
+      id: 1784973851235-source-1784975306138-target
+      source: '1784973851235'
+      sourceHandle: source
+      target: '1784975306138'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        selected: false
+        title: 用户输入
+        type: start
+        variables: []
+      height: 72
+      id: '1784973851235'
+      position:
+        x: 297.01774400204823
+        y: 987.1407843962863
+      positionAbsolute:
+        x: 297.01774400204823
+        y: 987.1407843962863
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - conversation
+          - conversation_history
+        default_value:
+        - key: text
+          type: string
+          value: '{"intent":"other","entities":{"product_name":null,"order_id":null,"issue_type":null},"need_human":false,"sentiment":"neutral"}'
+        error_strategy: default-value
+        model:
+          completion_params:
+            temperature: 0.2
+          mode: chat
+          name: qwen-max
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: fbd07b8b-232a-49d7-ad73-4ec2e7ce4c51
+          role: system
+          text: '你是一个电商智能客服的意图识别与槽位提取引擎。
+
+
+            ## 核心任务
+
+            分析用户的当前输入（结合对话历史理解指代），输出严格符合 JSON Schema 的结构化结果。
+
+
+            ## 意图分类定义
+
+            - query_order：查订单（关键词：订单、下单记录、买了什么）
+
+            - refund：退款（关键词：退款、退钱、不想要了）
+
+            - exchange：换货（关键词：换货、换一个、换型号）
+
+            - - consult：商品咨询（关键词：这款怎么样、参数、续航、适不适合、什么时候发货、发货时间、几天能到、运费多少、发什么快递、怎么开发票、能改地址吗、包裹丢了怎么赔）
+
+            - complaint：投诉（关键词：投诉、气死、骗人、垃圾、差评）
+
+            - other：其他未匹配意图
+
+
+            ## 多轮对话续接规则（最高优先级）
+
+            1. 如果对话历史中客服正在处理退款/换货流程（如要求用户提供订单号、退款理由等），且用户当前输入是在回应这些提问，则 保持原有意图不变
+
+            2. 特别地：当客服在退款流程中要求用户提供订单号，用户回复中包含订单号（16-20位数字）时，intent 必须为 "refund"
+
+            3. 判断方法：参考对话历史最后一条客服消息，如果包含"请提供订单号"、"订单号是多少"等提问，且用户当前输入包含订单号，则 intent
+            = "refund"
+
+            4. 同理适用于换货流程：如果上一轮在处理换货，用户补充信息时保持 intent = "exchange"
+
+
+            ## 槽位提取规则
+
+            - product_name：从用户输入中提取完整商品名（如"索尼WF-1000XM5蓝牙耳机"），未提及则为 null
+
+            - order_id：提取订单号（通常为 16-20 位数字），未提及则为 null
+
+            - issue_type：提取问题类型，枚举值：质量问题/物流问题/尺寸不符/描述不符/价格问题/其他，未提及则为 null
+
+
+            ## 转人工判断
+
+            以下情况 need_human 必须为 "true"：
+
+            1. intent 为 complaint
+
+            2. 需要人工操作的事情，例如改地址，修改或指定快递类型和物流方式，不包括询问快递类型
+
+            3. 用户明确要求"转人工"、"人工客服"
+
+            其他情况 need_human 为 "false"
+
+
+            ## 情绪判断
+
+            - positive：感谢、满意、赞美
+
+            - negative：愤怒、不满、焦虑、催促
+
+            - neutral：中性陈述、询问
+
+
+            ## 输出规则（必须遵守）
+
+            1. 只输出一个 JSON 对象，不要输出任何解释性文字
+
+            2. 不要使用 Markdown 代码块标记（不要出现 ```json 或 ```）
+
+            3. 严格遵循 JSON Schema 的字段类型和 required 约束
+
+            4. 未提及的实体槽位必须显式输出 null，不能省略
+
+            5. intent 必须是枚举值之一，不能自创
+
+            6. 当用户输入中出现"它"、"这款"、"那个"等指代时，参考对话历史中的 product_name 填充
+
+
+            ## 输出格式示例
+
+            {"intent":"consult","entities":{"product_name":"索尼WF-1000XM5蓝牙耳机","order_id":null,"issue_type":null},"need_human":false,"sentiment":"neutral"}'
+        - id: 9c625c42-9fec-4892-9480-0b4f66e2dd4c
+          role: user
+          text: '历史对话：
+
+            {{#sys.conversation_id#}}
+
+            {{#context#}}
+
+
+            当前会话意图：{{#conversation.current_intent#}}
+
+            当前退款步骤：{{#conversation.refund_step#}}
+
+
+            当前用户输入：
+
+            {{#sys.query#}}'
+        retry_config:
+          max_retries: 2
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        structured_output:
+          schema:
+            additionalProperties: false
+            properties:
+              entities:
+                description: 从用户消息中提取的实体槽位
+                properties:
+                  issue_type:
+                    description: 问题类型，如 质量问题/物流问题/尺寸不符/描述不符，未提及则为 null
+                    type:
+                    - string
+                    - 'null'
+                  order_id:
+                    description: 订单号，未提及则为 null
+                    type:
+                    - string
+                    - 'null'
+                  product_name:
+                    description: 商品名称，未提及则为 null
+                    type:
+                    - string
+                    - 'null'
+                required:
+                - product_name
+                - order_id
+                - issue_type
+                type: object
+              intent:
+                description: 用户意图，如 query_order（查订单）、refund（退款）、exchange（换货）、consult（商品咨询）、complaint（投诉）、other（其他）
+                enum:
+                - query_order
+                - refund
+                - exchange
+                - consult
+                - complaint
+                - other
+                type: string
+              need_human:
+                description: 是否需要转人工客服，枚举值：true/false
+                enum:
+                - 'true'
+                - 'false'
+                type: string
+              sentiment:
+                description: 用户情绪倾向
+                enum:
+                - positive
+                - negative
+                - neutral
+                type: string
+            required:
+            - intent
+            - entities
+            - need_human
+            - sentiment
+            type: object
+        structured_output_enabled: true
+        title: LLM 意图识别
+        type: llm
+        vision:
+          enabled: false
+      height: 153
+      id: '1784975306138'
+      position:
+        x: 731.8074294652614
+        y: 984.3415492782894
+      positionAbsolute:
+        x: 731.8074294652614
+        y: 984.3415492782894
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        classes:
+        - id: '1784981917529'
+          label: 投诉
+          name: "投诉：用户核心诉求是追责、赔偿、曝光、道歉，且目的意图是\"投诉\"本身。\n\n【强信号词，命中任一即归此类】\n- 含\"投诉\"\
+            作为目的：如\"我要投诉\"、\"申请投诉\"、\"举报\"、\"投诉你们\"\n- 含追责/曝光意图：如\"曝光\"、\"12315\"\
+            、\"律师\"、\"媒体\"、\"消协\"、\"起诉\"、\"报警\"\n- 情绪极度愤怒且核心诉求是追责/赔偿/曝光（而非办理退款）\n\n\
+            【排除规则——以下情况不归投诉】\n- 若用户核心诉求是办理\"退款/退货/换货\"（即希望完成售后操作），\n  即使附带说\"转人工\"\
+            ，仍归为\"退款换货\"\n  示例：\"退订单12345，转人工\" → 退款换货（由工作流路由转人工）\n- 若用户核心诉求是查询订单状态，即使不满情绪，仍归为\"\
+            订单查询\"\n- 若用户仅说\"转人工\"且无明确目的意图 → 归为\"其他\"\n\n【示例】\n- \"我要投诉，我现在情绪很激动\"\
+            \ → 投诉\n- \"投诉你们服务太差\" → 投诉\n- \"转人工客服\" → 投诉\n- \"我要曝光到网上\" → 投诉"
+        - id: '1784981904862'
+          label: 退款换货
+          name: '用户核心诉求是办理退款、退货、换货等售后操作（以完成售后办理为目的）。
+
+
+            【强信号词，命中任一即归此类】
+
+            - 含"退款/退钱/退费"：如"我要退款"、"申请退款"、"退钱"
+
+            - 含"退货/寄回"：如"我要退货"、"退回商品"
+
+            - 含"换货/换一个/换型号"：如"我要换货"、"换个颜色"
+
+            - 如果对话历史显示客服正在退款/换货流程中，用户补充订单号或退款原因等信息时，归于此类
+
+
+            【排除规则】
+
+            - 若用户核心诉求是"投诉"（即目的是追责/赔偿/曝光/转人工），即使涉及退款话题，也归为"投诉"
+
+            - 若用户只是在查询订单状态，归为"订单查询"
+
+
+            【示例】
+
+            - "我要退款，你们这破店骗人" → 退款换货（目的是退款）
+
+            - "申请退货" → 退款换货
+
+            - "我要换货" → 退款换货
+
+            -退订单 3178642857123454→ 退款换货
+
+            不包括：
+
+            -”七天无理由退货怎么操作“ → 商品咨询
+
+            - "我要投诉退款处理太慢" → 投诉（目的是投诉，不归此类）
+
+            -所有商品都能退吗→ 属于商品咨询和规则咨询，不属于退款退货
+
+            -退款多久到账→ 属于商品咨询和规则咨询'
+        - id: '2'
+          label: 订单查询
+          name: "订单查询：用户希望了解【具体某个订单】的实时状态、物流进度或订单详情，\n需要通过【订单号】获取动态数据。\n\n⚠️ 严格触发条件（必须同时满足）：\n\
+            1. 用户提供了具体订单号（如\"123456789\"），或明确指向\"我的某个订单\"\n2. 用户核心诉求是查询该订单的实时数据（状态/物流/详情）\n\
+            \n❌ 不属于订单查询的场景（即使语句中包含\"订单\"、\"快递\"、\"物流\"等词）：\n- 用户未提供具体订单号，仅咨询平台规则 →\
+            \ 商品咨询\n  （如\"发什么快递\"、\"运费多少\"、\"新疆能送到吗\"、\"订单能改地址吗\"）\n- 用户咨询的是操作性流程而非查询数据\
+            \ → 退款换货/商品咨询\n  （如\"怎么取消订单\"、\"我要退款\"）\n- 用户核心是投诉或追责 → 投诉\n\n包含以下场景：\n\
+            1. 订单状态查询：是否发货、是否支付成功、订单是否存在、当前处于哪个环节\n2. 物流进度追踪：包裹到哪了、预计何时送达、快递单号与承运商、运输轨迹\n\
+            3. 下单结果确认：刚下单后确认是否提交成功、支付是否扣款成功\n4. 订单详情核对：订单中的商品规格、数量、收货地址、下单时间、支付方式\n\
+            \n典型表述：\"我的订单到哪了\"、\"查一下订单 123456789\"、\"发货了吗\"、\"什么时候能送到\"\n\n不包括：取消订单、修改订单（地址/规格）、退款退货、换货、投诉追责、商品参数咨询、\n\
+            以及【未提供具体订单号的商品/规则咨询】——这些分别对应其他分类。"
+        - id: '1'
+          label: 商品咨询与规则查询
+          name: "商品咨询：用户咨询商品本身的规格参数，或咨询平台各类服务规则之类问题。例如：\n发货时间问题、配送相关的问题、签收、快递类型、物流追踪、异常件、订单状态、取消/修改订单、支付方式、发票等问题。这类问题不需要操作用户的\n\
+            实时订单数据，而是基于平台公开规则给予解答。则分类到此类。\n\n【强信号词，命中任一即归此类】\n- 发货时效：\"什么时候发货\"、\"\
+            何时发\"、\"今天/现在下单什么时候到\"、\n  \"预售多久发货\"、\"定制多久发货\"、\"节假日发货吗\"\n- 配送运费：\"\
+            运费多少\"、\"满多少包邮\"、\"新疆能送到吗\"、\"发什么快递\"、\n  \"发顺丰吗\"、\"保价怎么收费\"\n- 签收规则：\"\
+            需要本人签收吗\"、\"代签可以吗\"\n- 商品规格：\"参数\"、\"续航\"、\"功能\"、\"和XX哪个好\"、\"怎么选\"\n\
+            - 订单规则：\"怎么取消订单\"、\"订单能改地址吗\"、\"待发货是什么意思\"\n- 支付发票：\"支持花呗吗\"、\"怎么开发票\"\
+            \n\n【排除规则——以下情况不归商品咨询】\n- 用户提供了具体订单号并要查询该订单的实时状态/物流轨迹 → 归\"订单查询\"\n- 用户核心诉求是办理退款/退货/换货\
+            \ → 归\"退款换货\"\n- 用户核心诉求是投诉、追责、转人工、曝光 → 归\"投诉\"\n- 用户明确要求\"转人工\"且无任何业务咨询意图\
+            \ → 归\"其他\"\n示例：\n- \"发什么快递\" → 商品咨询（注意：不是\"其他\"！）\n- \"运费多少\" → 商品咨询（注意：不是\"\
+            其他\"！）\n- \"什么时候发货\" → 商品咨询（注意：不是\"其他\"！）\n- \"几天能到\" → 商品咨询（注意：不是\"其他\"\
+            ！）"
+        - id: '1784981930016'
+          label: 其他
+          name: "其他：不属于以上任何分类的未匹配问题，且不包含明确的业务咨询意图。\n\n⚠️ 严格触发条件（必须同时满足）：\n1. 用户输入不属于\"\
+            商品咨询\"中的任何子场景\n   （重要：含\"发货\"、\"运费\"、\"签收\"、\"快递\"、\"物流规则\"、\"订单规则\"、\"\
+            支付\"、\"发票\"等词的问题，一律归\"商品咨询\"，不归\"其他\"）\n2. 用户未提供具体订单号查询实时数据\n3. 用户核心诉求不是退款/退货/换货\n\
+            4. 用户核心诉求不是投诉或追责\n\n【明确归\"其他\"的场景】\n- 闲聊、问候（如\"你好\"、\"谢谢\"）\n- 与电商无关的问题（如\"\
+            今天天气怎么样\"）\n- 无法理解的问题（如\"asdfghjkl\"）\n- 用户仅说\"转人工\"且无任何业务咨询意图\n\n【关于\"\
+            修改订单地址/指定物流\"的处理——重要澄清】\n- 若用户问\"订单能改地址吗\"、\"怎么改收货地址\" → 这是订单规则咨询，\n \
+            \ 归\"商品咨询\"（基于平台规则解答），不要归\"其他\"\n- 若用户说\"我要转人工改地址\" → 核心诉求是转人工，归\"其他\"\
+            \n- 若用户问\"能指定发顺丰吗\" → 这是配送规则咨询，归\"商品咨询\"\n- 仅当用户明确说\"转人工\"且未咨询任何业务规则时，才归\"\
+            其他\"\n\n【示例】\n- \"你好\" → 其他\n- \"今天天气怎么样\" → 其他\n- \"asdfghjkl\" → 其他\n\
+            - \"转人工\" → 其他\n- \"什么时候发货\" → 商品咨询（不是\"其他\"！）\n- \"运费多少\" → 商品咨询（不是\"\
+            其他\"！）\n- \"发什么快递\" → 商品咨询（不是\"其他\"！）\n- \"订单能改地址吗\" → 商品咨询（不是\"其他\"！）"
+        instruction: "你是一个严格的电商客服意图分类器。\n用户问题：{{#1784975306138.structured_output.intent#}}\n\
+          规则：\n1. 只根据用户当前这句话判断意图，不依赖任何上游输入，不被措辞情绪带偏\n2. 必须且只能选择一个分类，输出分类名称\n3. 多意图同时存在时，按以下优先级判定：\n\
+          \   投诉 > 退款换货 > 订单查询 > 商品咨询 > 其他\n4. 核心诉求判定法：\n   -用户问\"发什么快递/运费多少/什么时候发货/发货时间/几天能到/怎么开发票/支持花呗吗/订单能改地址吗/包裹丢了怎么赔\"\
+          等平台规则 → 商品咨询\n   - 用户提供了具体订单号（16-20位数字）并要查该订单的实时状态/物流 → 订单查询\n   - 用户说\"\
+          退款/退货/换货\" → 退款换货\n   - 用户说\"投诉/转人工/曝光/12315\" → 投诉\n5. 边界判定要点：\n   - \"\
+          发什么快递\" → 商品咨询（问的是规则，不是查具体订单）\n   - \"我的包裹到哪了\"+ 订单号 → 订单查询\n   - \"我的包裹到哪了\"\
+          + 无订单号 → 商品咨询（引导用户提供订单号或自助查询）\n   - \"订单能改地址吗\"（无具体订单号）→ 商品咨询（咨询规则）\n  \
+          \ - \"帮我改订单地址\"+ 有订单号 → 其他（办理动作）\n   -例如修改订单地址、物流，或者指定物流这类复杂问题且需要人工的，走”其他“分支，转人工处理→\
+          \ 其他（办理动作）\n- \"什么时候发货\"/\"几天能到\" → 商品咨询（问的是发货规则，不是查具体订单）\n- \"发货了吗\" +\
+          \ 无订单号 → 商品咨询（引导用户提供订单号）\n- \"发货了吗\" + 有订单号 → 订单查询\n6. 咨询与 办理的区分（高优先级，覆盖以上规则）：\n\
+          \   判定法：带疑问词（吗/多久/怎么/能不能/是否/能不能退/能不能换）的是\"咨询规则\"→ 商品咨询；带祈使语气（我要/帮我/请/退订单+号码）的是\"\
+          办理动作\"→ 退款换货\n   - \"所有商品都能退吗\" → 商品咨询（咨询退货政策，非申请退货）\n   - \"退货政策是什么\" →\
+          \ 商品咨询\n   - \"我要退款\"/\"退订单12345\" → 退款换货（办理动作）\n   - \"换货多久能收到新商品\" → 商品咨询（咨询换货时效，非申请换货）\n\
+          \   - \"换货流程是什么\" → 商品咨询\n   - \"我要换货\" → 退款换货（办理动作）\n   - \"质量问题能免费修吗\"\
+          \ → 商品咨询（咨询质保政策，非申请售后）\n   - \"质保期多久\" → 商品咨询\n   - \"质量问题要退货\" → 退款换货（办理动作）\n\
+          \   - \"什么时候发货\"（无订单号） → 商品咨询（咨询发货规则）\n   - \"今天下单什么时候发\" → 商品咨询\n   - \"\
+          我的订单什么时候发货\"（有订单号） → 订单查询\n7. 禁止输出解释，只输出分类名称\n8. 如果对话历史中客服正在处理退款/换货流程（如要求用户提供订单号），且用户当前输入是在补充订单号等信息，则归为\"\
+          退款换货\""
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: qwen3.7-plus
+          provider: langgenius/tongyi/tongyi
+        query_variable_selector:
+        - sys
+        - query
+        selected: false
+        title: 问题分类器
+        type: question-classifier
+        vision:
+          enabled: false
+      height: 303
+      id: '1784979242299'
+      position:
+        x: 1076.2507729274002
+        y: 984.3415492782894
+      positionAbsolute:
+        x: 1076.2507729274002
+        y: 984.3415492782894
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: '从用户输入中提取订单号。
+
+          规则：
+
+          1. 订单号通常为16-20位连续数字
+
+          2. 如果用户没有明确提供订单号，输出空字符串 ""
+
+          3. 如果提到多个订单号，用 # 隔开，例如 "1234567890123456#9876543210987654"
+
+          4. 忽略手机号、快递单号等其他数字串
+
+          5. 只输出提取结果，不要任何解释'
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: 客户的订单号，通常为 16-20 位数字
+          name: order_id
+          required: true
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: 参数提取器
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 87
+      id: '1785053244582'
+      position:
+        x: 1969.872938702165
+        y: 86.73565118643333
+      positionAbsolute:
+        x: 1969.872938702165
+        y: 86.73565118643333
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785053244582'
+          - order_id
+          variable_selector:
+          - conversation
+          - order_id
+        selected: false
+        title: 变量赋值
+        type: assigner
+        version: '2'
+      height: 83
+      id: '1785053445270'
+      position:
+        x: 2294.6316230855195
+        y: 86.73565118643333
+      positionAbsolute:
+        x: 2294.6316230855195
+        y: 86.73565118643333
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        error_strategy: fail-branch
+        headers: ''
+        method: get
+        params: order_id :{{#1785053244582.order_id#}}
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        ssl_verify: true
+        timeout:
+          connect: 10
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+          read: 30
+          write: 30
+        title: HTTP 请求
+        type: http-request
+        url: https://httpbingo.org/get
+        variables: []
+      height: 157
+      id: '1785053488379'
+      position:
+        x: 3356
+        y: -86.69569099858613
+      positionAbsolute:
+        x: 3356
+        y: -86.69569099858613
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 4c7396b6-cd41-4562-b20a-61e270a48433
+          role: system
+          text: '你是一名专业的电商客服助手。
+
+
+            # 角色定位
+
+            用户进入了订单查询分支。当前系统处于模拟阶段，订单/物流数据来自模拟接口，并非真实生产数据。你需要基于模拟接口返回的数据和知识库规范，为用户生成友好、合规的回复，并明确告知用户当前为模拟环境。
+
+
+            # 用户输入
+
+            用户原始问题：{{#sys.query#}}
+
+
+            抽取到的订单号：{{#1785053244582.order_id#}}
+
+
+            # 模拟接口返回的订单/物流数据
+
+            {{#1785053488379.body#}}
+
+            自己根据场景生成模拟数据。
+
+
+            # 处理规则
+
+
+            ## 场景：模拟接口返回了订单数据
+
+            当上方"模拟接口返回的订单/物流数据"中存在有效信息时：
+
+            1. 提取关键信息：订单号、当前状态、物流公司、运单号、运输轨迹、预计送达时间
+
+            2. 用知识库中的"订单状态说明"解释当前状态含义，让用户易懂
+
+            3. 结合知识库中的"各状态常见问题与话术"选择合适的客服话术
+
+            4. 适当加粗关键信息（订单号、状态、预计送达时间等）
+
+            5. 在回复末尾如实说明："（当前为模拟数据演示，接入真实系统后将返回您的实际订单信息）"
+
+            6. 语气亲切专业
+
+
+
+            # 硬性约束（基于知识库"禁止承诺清单"）
+
+            - ❌ 禁止编造接口未返回的物流轨迹、时间节点或订单信息
+
+            - ❌ 禁止承诺"一定今天发货"、"一定明天送达"、"某某时间前必到"
+
+            - ❌ 禁止说"系统显示签收就一定收到了"
+
+            - ❌ 禁止将模拟数据说成用户的真实订单数据
+
+            - ✅ 以模拟接口返回的数据为准进行演示性回复，知识库用于话术规范与异常处理
+
+            - ✅ 如接口数据不完整，如实告知用户，并说明真实系统接入后的预期能力
+
+
+            # 特殊情况处理
+
+            - 若模拟数据返回"已签收"：按知识库话术引导"先检查快递柜/驿站/物业，如确未收到我为您登记核查"
+
+            - 若模拟数据返回"运输中"且超过48小时未更新：告知"已超过48小时未更新，真实系统接入后将为您的订单按异常件登记处理"
+
+            - 若模拟数据返回"待发货"且超过48小时：告知"已超过48小时未发货，真实系统接入后我将帮您加急催仓处理"
+
+
+            # 输出要求
+
+            - 直接输出回复内容，无需解释你的推理过程
+
+            - 回复简洁明了，重点突出用户最关心的物流进度或订单状态
+
+            - 使用适当的换行和加粗，提升可读性
+
+            - 模拟演示场景下，必须在回复中体现"模拟数据"的如实告知，避免误导用户'
+        retry_config:
+          max_retries: 2
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        structured_output_enabled: true
+        title: LLM 2
+        type: llm
+        vision:
+          enabled: false
+      height: 117
+      id: '1785053672798'
+      position:
+        x: 3718
+        y: -225.68493934793287
+      positionAbsolute:
+        x: 3718
+        y: -225.68493934793287
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: 1964ce61-14a7-4182-ab64-291d60588682
+            value: ''
+            varType: string
+            variable_selector:
+            - '1785053244582'
+            - order_id
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: 条件分支 1
+        type: if-else
+      height: 123
+      id: '1785054055027'
+      position:
+        x: 2663.855039838294
+        y: 86.73565118643333
+      positionAbsolute:
+        x: 2663.855039838294
+        y: 86.73565118643333
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '您好，请提供您的订单号，以便为您查询订单状态。
+
+          订单号通常为16-20位数字，可在"我的订单"页面查看。'
+        selected: false
+        title: 直接回复 2
+        type: answer
+        variables: []
+      height: 131
+      id: '1785054146137'
+      position:
+        x: 3034
+        y: 288.27655268960757
+      positionAbsolute:
+        x: 3034
+        y: 288.27655268960757
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        default_value:
+        - key: text
+          type: string
+          value: '"抱歉，订单系统暂时不可用，请联系人工客服：400-888-8888"  重试：开启，最大 2 次'
+        error_strategy: default-value
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 5eac817a-d262-4f3e-b8bf-6f0cc4e882b1
+          role: system
+          text: '你是一个电商客服助手。当前订单查询服务暂时不可用。
+
+
+            用户原始问题：{{#sys.query#}}
+
+
+            请生成一段友好、专业的回复，告知用户：
+
+            1. 系统暂时繁忙，订单信息查询失败
+
+            2. 建议用户稍后重试
+
+            3. 提供人工客服联系方式：400-888-8888
+
+            4. 表达歉意
+
+
+            语气要求：亲切、专业、有同理心。'
+        retry_config:
+          max_retries: 2
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        title: LLM 3
+        type: llm
+        vision:
+          enabled: false
+      height: 153
+      id: '1785054538156'
+      position:
+        x: 3718
+        y: 75.22201872955245
+      positionAbsolute:
+        x: 3718
+        y: 75.22201872955245
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1785153347805'
+          - result
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 81827808-b7dc-440a-9348-2c864da90975
+          role: system
+          text: "你是一名电商平台的商品咨询客服\"小商\"。\n\n【知识库状态】未命中——知识库中暂未收录相关内容。\n【检索到的知识库内容】\n\
+            {{#context#}}\n\n## 绝对铁律（不可违反，按优先级执行）\n\n1. 当【知识库状态】为\"未命中\"时，你必须且只能输出以下固定话术（一字不差）：\n\
+            \   \"抱歉，关于这个问题，当前知识库中暂未收录相关信息。为了给您更准确的建议，能否告诉我您感兴趣的具体商品名称？或者您可以联系人工客服，获取一对一的专业推荐服务。\"\
+            \n   禁止在此话术之外添加任何商品描述、参数、建议。\n\n2. 当【检索到的知识库内容】有内容时，仅基于该内容回答。\n   禁止添加知识库之外的任何信息，禁止用你自身的知识补充。\n\
+            \n3. 禁止编造：商品参数、型号、价格、政策、规格、功能描述。\n   禁止说\"知识库中已有记录\"、\"根据知识库内容\"等暗示已收录的表述。\n\
+            \   禁止推荐\"蓝牙耳机A\"、\"蓝牙耳机B\"等虚构商品。\n\n4. 如果知识库内容不足以回答用户问题，明确回复：\n   \"\
+            根据现有资料，暂时无法回答该问题。建议您联系人工客服获取更多帮助。\"\n   不得结合自身知识硬编答案。\n\n## 当用户问\"蓝牙耳机怎么选\"\
+            这类通用问题时\n正确回复示例：\n\"抱歉，关于蓝牙耳机的通用选购建议，当前知识库中暂未收录相关信息。\n为了给您更准确的建议，能否告诉我您感兴趣的具体商品名称？\n\
+            或者您可以联系人工客服，获取一对一的专业推荐服务。\"\n\n\n## 输出要求\n- 使用\"您\"称呼\n- 长度控制在 100 字以内\n\
+            - 不确定时选择\"告知未收录\"，而非\"用自身知识回答\""
+        - id: c1005d71-2034-466a-90a5-f2fb63d7ddf2
+          role: user
+          text: '用户问题：{{#sys.query#}}
+
+            咨询商品：{{#conversation.current_product#}}'
+        selected: false
+        title: 通用LLM
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785063021374'
+      position:
+        x: 3718
+        y: 644.6167997234415
+      positionAbsolute:
+        x: 3718
+        y: 644.6167997234415
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1785066533456'
+          - structured_message
+          variable_selector:
+          - conversation
+          - conversation_history
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - conversation
+          - turn_count
+        selected: false
+        title: 变量赋值 2
+        type: assigner
+        version: '2'
+      height: 109
+      id: '1785064423301'
+      position:
+        x: 4830.508944322817
+        y: 68.85231785310012
+      positionAbsolute:
+        x: 4830.508944322817
+        y: 68.85231785310012
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "def main(success_text: str, fallback_text: str) -> dict:\n    # 归一化：哪个分支有输出就用哪个\n\
+          \    final_reply = success_text if success_text else fallback_text\n   \
+          \ \n    # 防御：两个分支都为空时的默认回复\n    if not final_reply:\n        final_reply\
+          \ = \"抱歉，订单查询出现问题，请稍后重试或联系人工客服：400-888-8888。\"\n    \n    # 同时输出两个变量：\n\
+          \    # 1. final_reply（字符串）→ 给「直接回复」节点用\n    # 2. structured_message（对象）→\
+          \ 给「变量赋值 2」节点追加到 conversation_history 用\n    return {\n        \"final_reply\"\
+          : final_reply,\n        \"structured_message\": {\n            \"role\"\
+          : \"assistant\",\n            \"content\": final_reply\n        }\n    }"
+        code_language: python3
+        outputs:
+          final_reply:
+            children: null
+            type: string
+          structured_message:
+            children: null
+            type: object
+        selected: false
+        title: 归一化
+        type: code
+        variables:
+        - value_selector:
+          - '1785053672798'
+          - text
+          value_type: string
+          variable: success_text
+        - value_selector:
+          - '1785054538156'
+          - text
+          value_type: string
+          variable: fallback_text
+      height: 51
+      id: '1785066533456'
+      position:
+        x: 4120
+        y: 68.85231785310012
+      positionAbsolute:
+        x: 4120
+        y: 68.85231785310012
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '>'
+            id: ec755e80-b82d-46f4-ba51-64a203de9808
+            value: '10'
+            varType: number
+            variable_selector:
+            - conversation
+            - turn_count
+          - comparison_operator: is
+            id: 3c243568-9ff3-4abe-80bb-7830c4452b4c
+            value: 'true'
+            varType: object
+            variable_selector:
+            - '1784975306138'
+            - structured_output
+            - need_human
+          id: 'true'
+          logical_operator: or
+        selected: false
+        title: 条件分支 2
+        type: if-else
+      height: 173
+      id: '1785134888171'
+      position:
+        x: 5355.552879416268
+        y: 756.580500606162
+      positionAbsolute:
+        x: 5355.552879416268
+        y: 756.580500606162
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: "{{#1785066533456.final_reply#}}{{#1785228866975.final_reply#}}{{#17851570561020.final_reply#}}{{#17851570561020.final_reply#}}{{#1785234111201.final_reply#}}\n\
+          “根据你的需求，正在为您转接人工客服，请稍候...”\n 您的会话编号：{{#sys.conversation_id#}}"
+        selected: false
+        title: 直接回复 1
+        type: answer
+        variables: []
+      height: 228
+      id: '1785136009105'
+      position:
+        x: 5786
+        y: 671.7665304266854
+      positionAbsolute:
+        x: 5786
+        y: 671.7665304266854
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17851570561020.final_reply#}}{{#1785066533456.final_reply#}}{{#1785228866975.final_reply#}}{{#1785234111201.final_reply#}}'
+        selected: false
+        title: 直接回复 2
+        type: answer
+        variables: []
+      height: 158
+      id: '1785136051661'
+      position:
+        x: 5786
+        y: 936.3706470616553
+      positionAbsolute:
+        x: 5786
+        y: 936.3706470616553
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: '从用户输入中提取商品咨询所需参数。
+
+          1. product_name：商品全称。如果直接提及则提取；如果用"它/这款/那个"等指代词，结合对话历史和意图识别结果还原为具体商品名；未提及则为
+          null
+
+          2. consult_dimension：用户关心的维度（规格/功能/价格/续航/兼容性/售后/配送/签收/发货/退换货/其他）；未提及则为 null
+
+          3. 输出严格符合 JSON Schema 的结构化数据'
+        memory:
+          query_prompt_template: '{{#sys.query#}}
+
+
+            {{#sys.files#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 10
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: 商品全称，如"索尼WF-1000XM5蓝牙耳机"。若用户用"它/这款/那个"指代，参考对话历史和意图识别 进行填充；未提及则为
+            null
+          name: product_name
+          required: false
+          type: string
+        - description: 咨询维度，枚举值：规格/功能/价格/续航/兼容性/售后/其他；未提及则为 null
+          name: consult_dimension
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: 参数提取器 2
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 87
+      id: '1785151051500'
+      position:
+        x: 1988
+        y: 508.4751650179493
+      positionAbsolute:
+        x: 1988
+        y: 508.4751650179493
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785151051500'
+          - product_name
+          variable_selector:
+          - conversation
+          - current_product
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785151051500'
+          - consult_dimension
+          variable_selector:
+          - conversation
+          - current_dimension
+        selected: false
+        title: 变量赋值 3
+        type: assigner
+        version: '2'
+      height: 109
+      id: '1785152632360'
+      position:
+        x: 2330
+        y: 515.1196969696969
+      positionAbsolute:
+        x: 2330
+        y: 515.1196969696969
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        dataset_ids:
+        - kh2mOJAMnGSpLQ2MrWp0MN/ylEI85LlpVu+U1mTwjLNpu192WH8AWcXdelZgjTQd
+        - mpXH/lGlm9hh4e7gzFXC8g4AJkOA3RFvxAyvjQZK5dHeKKw/IylloXNzqJVakj7R
+        - ezzhTyhUaGW16nc69CbSGr/5f4MaZ3pNmpUHE8X3fv/DYsLx7a40WX0UmKSBL8VU
+        - hDkItaG3vMxWbmDr4bE8H2lp2TDROAbCHWDAAAMv3dYnUz+x5RnIELrtHisHy5Mx
+        - dLGf9zuwr+dgptkkif8VsbF+U7MqkTj1qUfTMFmDwlUi1G1G4sHKoD58fnou80DZ
+        multiple_retrieval_config:
+          reranking_enable: true
+          reranking_mode: reranking_model
+          reranking_model:
+            model: qwen3-rerank
+            provider: langgenius/tongyi/tongyi
+          score_threshold: 0.65
+          top_k: 5
+          weights:
+            keyword_setting:
+              keyword_weight: 0.3
+            vector_setting:
+              embedding_model_name: text-embedding-v1
+              embedding_provider_name: langgenius/tongyi/tongyi
+              vector_weight: 0.7
+            weight_type: customized
+        query_attachment_selector: []
+        query_variable_selector:
+        - '1785154209566'
+        - output
+        retrieval_mode: multiple
+        selected: false
+        title: 知识检索
+        type: knowledge-retrieval
+      height: 173
+      id: '1785153347805'
+      position:
+        x: 3040.4437723988394
+        y: 515.1196969696969
+      positionAbsolute:
+        x: 3040.4437723988394
+        y: 515.1196969696969
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: 自动输出一个 output 变量（String 类型），这就是拼接好的检索 query。
+        selected: false
+        template: "{% set parts = [] %}\r\n{% if product and product.strip() %}{%\
+          \ set parts = parts + [product.strip()] %}{% endif %}\r\n{% if dimension\
+          \ and dimension.strip() %}{% set parts = parts + [dimension.strip()] %}{%\
+          \ endif %}\r\n{% if query and query.strip() %}{% set parts = parts + [query.strip()]\
+          \ %}{% endif %}\r\n{{ parts | join(\" \") | trim }}"
+        title: 模板转换
+        type: template-transform
+        variables:
+        - value_selector:
+          - conversation
+          - current_product
+          value_type: string
+          variable: product
+        - value_selector:
+          - conversation
+          - current_dimension
+          value_type: string
+          variable: dimension
+        - value_selector:
+          - sys
+          - query
+          value_type: string
+          variable: query
+      height: 95
+      id: '1785154209566'
+      position:
+        x: 2663.855039838294
+        y: 515.1196969696969
+      positionAbsolute:
+        x: 2663.855039838294
+        y: 515.1196969696969
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: c4e55747-e72f-4ba1-b010-8fe5a059b42a
+            value: ''
+            varType: array[object]
+            variable_selector:
+            - '1785153347805'
+            - result
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: 条件分支 3
+        type: if-else
+      height: 123
+      id: '1785154435162'
+      position:
+        x: 3363.4178792805346
+        y: 515.1196969696969
+      positionAbsolute:
+        x: 3363.4178792805346
+        y: 515.1196969696969
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - '1785153347805'
+          - result
+        model:
+          completion_params:
+            temperature: 0.3
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 43608819-32a7-4cc1-8134-91044bdbd4e0
+          role: system
+          text: '你是一名电商平台的商品咨询客服"小商"。
+
+            请基于知识库回答用户的问题。
+
+            知识库内容：{{#context#}}
+
+
+            ## 严格要求
+
+            1. 回答必须完全基于知识库内容，禁止编造知识库中不存在的参数、功能、价格
+
+            2. 如果知识库内容能回答问题，用亲切专业的语气回复，关键信息加粗
+
+            3. 如果知识库内容不足以完全回答，说明已知信息，并引导用户补充具体问题或联系人工
+
+            4. 使用"您"称呼用户
+
+            5. 涉及具体参数时必须引用知识库原文
+
+            6. 回复长度控制在 150 字以内
+
+            7. 必须还原完整商品名，参考知识库中的商品全称。例如''索尼XM5''应还原为''索尼WF-1000XM5蓝牙耳机''。"
+
+            '
+        - id: cec79c79-1431-4925-8005-ead1625d306f
+          role: user
+          text: '用户问题：{{#sys.query#}}
+
+            咨询商品：{{#conversation.current_product#}}
+
+            咨询维度：{{#conversation.current_dimension#}}
+
+            对话历史：{{#conversation.conversation_history#}}'
+        selected: false
+        title: LLM 润色
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785154507610'
+      position:
+        x: 3718
+        y: 480.58333333333326
+      positionAbsolute:
+        x: 3718
+        y: 480.58333333333326
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\ndef main(consult_text: str, fallback_text: str) -> dict:\n    # 优先用知识库润色的回复，其次用通用回答\n\
+          \    final_reply = consult_text if consult_text else fallback_text\n   \
+          \ \n    # 防御：两个分支都为空时的默认回复\n    if not final_reply:\n        final_reply\
+          \ = \"抱歉，暂时无法回答您的问题，正在为您转接人工客服...\"\n    \n    return {\n        \"final_reply\"\
+          : final_reply,\n        \"structured_message\": {\n            \"role\"\
+          : \"assistant\",\n            \"content\": final_reply\n        }\n    }"
+        code_language: python3
+        desc: ''
+        isInIteration: false
+        isInLoop: false
+        outputs:
+          final_reply:
+            children: null
+            type: string
+          structured_message:
+            children: null
+            type: object
+        selected: false
+        title: 归一化 2
+        type: code
+        variables:
+        - value_selector:
+          - '1785154507610'
+          - text
+          value_type: string
+          variable: consult_text
+        - value_selector:
+          - '1785063021374'
+          - text
+          value_type: string
+          variable: fallback_text
+      height: 51
+      id: '17851570561020'
+      position:
+        x: 4080
+        y: 637.5863636363636
+      positionAbsolute:
+        x: 4080
+        y: 637.5863636363636
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '17851570561020'
+          - structured_message
+          variable_selector:
+          - conversation
+          - conversation_history
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - conversation
+          - turn_count
+        selected: false
+        title: 变量赋值 4
+        type: assigner
+        version: '2'
+      height: 109
+      id: '1785221577631'
+      position:
+        x: 4462
+        y: 617.2530303030301
+      positionAbsolute:
+        x: 4462
+        y: 617.2530303030301
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: "你是一个电商售后的参数提取引擎。从用户输入中提取退款/退货所需的结构化信息。\n\n## 提取规则\n1. order_id：用户的订单号，通常为\
+          \ 16-20 位数字。支持以下表达方式的提取：\n   - 直接数字：\"订单号是 31786428571\" → \"31786428571\"\
+          \n   - 带\"订单\"前缀：\"查一下订单 31786428571\" → \"31786428571\"\n   - 如果用户输入中出现\"\
+          它\"、\"这个订单\"等指代词，参考对话历史中的 order_id 进行填充\n   - 用户未提供则为 null\n\n2. refund_reason：退款/退货原因，必须标准化为以下枚举值之一：\n\
+          \   - 质量问题（商品损坏、功能故障、质量缺陷）\n   - 尺寸不符（买大了/买小了/版型不合身）\n   - 不想要了（冲动消费、改变主意、买错了）\n\
+          \   - 物流问题（快递损坏、配送延迟、送错地址）\n   - 描述不符（与商品页面描述不一致）\n   - 价格问题（降价了、价格虚高）\n\
+          \   - 其他（不属于以上任何一类）\n   - 用户未提供则为 null\n\n3. issue_type：问题类型，标准化为以下枚举值之一：\n\
+          \   - 质量问题/物流问题/尺寸不符/描述不符/价格问题/其他\n   - 用户未提供则为 null\n\n## 处理规则\n- 严格遵守枚举值，不得将\
+          \ refund_reason 或 issue_type 设置为枚举外的值\n- 未提及的字段必须显式输出 null，不能省略\n- 当用户输入中出现\"\
+          它\"、\"这个\"、\"那个\"等指代时，参考对话历史填充\n- 如果对话历史中已有 order_id 且本轮未提及新订单号，沿用历史中的 order_id\n\
+          \n## 输出要求\n- 只输出符合 JSON Schema 的结构化数据\n- 不要输出任何解释性文字\n- 不要使用 Markdown 代码块标记"
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: 订单号，通常为 16-20 位数字
+          name: order_id
+          required: false
+          type: string
+        - description: 退款/退货原因：质量问题/尺寸不符/不想要了/物流问题/其他
+          name: refund_reason
+          required: false
+          type: string
+        - description: 问题类型，枚举值：质量问题/物流问题/尺寸不符/描述不符/价格问题/其他
+          name: issue_type
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: 参数提取器 3
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 87
+      id: '1785225696625'
+      position:
+        x: 1696.78242586771
+        y: 1014.3030303030303
+      positionAbsolute:
+        x: 1696.78242586771
+        y: 1014.3030303030303
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785225696625'
+          - order_id
+          variable_selector:
+          - conversation
+          - refund_order_id
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785225696625'
+          - refund_reason
+          variable_selector:
+          - conversation
+          - refund_reason
+        - input_type: constant
+          operation: set
+          value: applied
+          variable_selector:
+          - conversation
+          - refund_step
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1784975306138'
+          - structured_output
+          - intent
+          variable_selector:
+          - conversation
+          - current_intent
+        selected: false
+        title: 变量赋值 5
+        type: assigner
+        version: '2'
+      height: 161
+      id: '1785226071666'
+      position:
+        x: 1988
+        y: 1014.3030303030303
+      positionAbsolute:
+        x: 1988
+        y: 1014.3030303030303
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: not empty
+            id: f71b0566-2f25-4f3e-b5df-3bd4100ae4d8
+            value: ''
+            varType: string
+            variable_selector:
+            - conversation
+            - refund_order_id
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: 条件分支 4
+        type: if-else
+      height: 123
+      id: '1785226908015'
+      position:
+        x: 2330
+        y: 1014.3030303030303
+      positionAbsolute:
+        x: 2330
+        y: 1014.3030303030303
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        authorization:
+          config: null
+          type: no-auth
+        body:
+          data: []
+          type: none
+        error_strategy: fail-branch
+        headers: Content-Type:application/json
+        method: get
+        params: ''
+        retry_config:
+          max_retries: 3
+          retry_enabled: true
+          retry_interval: 1000
+        selected: false
+        ssl_verify: true
+        timeout:
+          max_connect_timeout: 0
+          max_read_timeout: 0
+          max_write_timeout: 0
+        title: HTTP 请求 2
+        type: http-request
+        url: https://httpbingo.org/get?orderId={{#conversation.refund_order_id#}}
+        variables: []
+      height: 176
+      id: '1785226986121'
+      position:
+        x: 2692
+        y: 948.8597078040251
+      positionAbsolute:
+        x: 2692
+        y: 948.8597078040251
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: e14bad55-acfa-45cf-9ba7-ed393a6f568e
+          role: system
+          text: '你是一名电商平台的售后客服"小退"。
+
+            用户表达了退款/退货意向，但尚未提供订单号。
+
+
+            ## 任务
+
+            1. 首先向用户真诚道歉，安抚其负面情绪（尤其是“骗人”等激烈用语）。
+
+            2. 然后明确回应用户的退款/退货诉求，确认已收到请求并承诺处理（例如：“我已收到您的退款申请，我会立即为您处理”）。
+
+            3. 最后引导用户提供订单号，以便查询订单状态和售后资格。
+
+
+            ## 要求
+
+            1. 使用"您"称呼用户
+
+            2. 语气友好耐心，对负面情绪表示理解
+
+            3. 用户明确退款退货的前提下，禁止再次询问”您想申请退款是吗？“类似的话语，而是肯定用户的诉求
+
+            4. **必须严格按照顺序：先道歉安抚 → 再确认诉求并承诺处理 → 最后索要订单号**
+
+            5. 提示订单号格式（16-20位数字）和查找位置（“我的订单”页面）
+
+            6. 回复长度控制在 80 字以内
+
+
+            ## 对话历史
+
+            {{#conversation.conversation_history#}}'
+        - id: 390e2ef6-a598-42de-9eae-40ec8e7e8daf
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: LLM 引导
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785226992270'
+      position:
+        x: 2707.6798519862887
+        y: 1321.1993889470655
+      positionAbsolute:
+        x: 2707.6798519862887
+        y: 1321.1993889470655
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1785226992270.text#}}'
+        selected: false
+        title: 直接回复 4
+        type: answer
+        variables: []
+      height: 102
+      id: '1785227114986'
+      position:
+        x: 3034
+        y: 1321.1993889470655
+      positionAbsolute:
+        x: 3034
+        y: 1321.1993889470655
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "import json\nfrom datetime import datetime, timedelta\n\ndef main(order_id:\
+          \ str, refund_reason: str, product_name: str) -> dict:\n    if not order_id\
+          \ or not order_id[-1].isdigit():\n        return {\n            \"simulated_order_data\"\
+          : json.dumps(\n                {\"error\": \"无效的订单号\"}, ensure_ascii=False),\n\
+          \            \"eligible\": \"false\",\n            \"rejection_reason\"\
+          : \"订单号无效\",\n            \"logistics_status\": \"unknown\",\n         \
+          \   \"refund_amount\": \"退款金额将按原支付方式返回\",\n            \"estimated_refund_days\"\
+          : \"3\"\n        }\n    \n    last_digit = int(order_id[-1])\n    now =\
+          \ datetime.now()\n    \n    # ✅ 修正：运输中和超7天不能同时成立\n    if last_digit in (0,\
+          \ 3, 6, 9):\n        # 运输中（未签收）\n        logistics_status = \"transporting\"\
+          \n        sign_date = None\n        days_since_sign = None\n        within_7days\
+          \ = False  # 未签收，7天时限未启动\n        # ⚠️ 关键：拒绝原因不再是\"超7天\"，而是\"未签收\"\n   \
+          \     rejection_reason = \"您的订单目前运输中，尚未签收，不适用7天无理由退货。我们可以为您安排拦截退款，或者等签收后若有问题再申请7天无理由退货\"\
+          \n        can_intercept = True  # 可拦截\n    elif last_digit in (1, 5, 7):\n\
+          \        # 已签收 10 天前 → 超7天\n        logistics_status = \"delivered\"\n \
+          \       days_since_sign = 10\n        sign_date = (now - timedelta(days=days_since_sign)).strftime(\"\
+          %Y-%m-%d\")\n        within_7days = False\n        rejection_reason = f\"\
+          您的订单已于{sign_date}签收，距今已超过7天无理由退货期限，无法办理退货\"\n        can_intercept = False\n\
+          \    else:  # 2,4,8\n        # 已签收 3 天前 → 7天内\n        logistics_status\
+          \ = \"delivered\"\n        days_since_sign = 3\n        sign_date = (now\
+          \ - timedelta(days=days_since_sign)).strftime(\"%Y-%m-%d\")\n        within_7days\
+          \ = True\n        rejection_reason = \"符合7天无理由退货条件\"\n        can_intercept\
+          \ = False\n    \n    cannot_return = (logistics_status == \"transporting\"\
+          ) or (not within_7days)\n    \n    mock_order = {\n        \"order_id\"\
+          : order_id,\n        \"product_name\": product_name,\n        \"logistics_status\"\
+          : logistics_status,\n        \"sign_date\": sign_date,\n        \"days_since_sign\"\
+          : days_since_sign,\n        \"within_7days\": within_7days,\n        \"\
+          eligible_for_refund\": (logistics_status == \"delivered\" and within_7days),\n\
+          \        \"refund_reason\": refund_reason or \"未提供\",\n        \"refund_amount\"\
+          : \"退款金额将按原支付方式返回\",\n        \"estimated_refund_days\": 3,\n        \"\
+          rejection_reason\": rejection_reason,\n        \"can_intercept\": can_intercept,\
+          \  # 新增：是否可拦截\n        \"alternative_options\": [\"换货\", \"维修\"] if not\
+          \ can_intercept else [\"拦截退款\", \"换货\"],\n        \"refund_policy\": \"\
+          依据《网络购买商品七日无理由退货暂行办法》第十条，七日期间自签收商品的次日开始起算\",\n        \"quality_issue\"\
+          : refund_reason == \"质量问题\",\n    }\n    \n    return {\n        \"simulated_order_data\"\
+          : json.dumps(mock_order, ensure_ascii=False),\n        \"eligible\": \"\
+          true\" if (logistics_status == \"delivered\" and within_7days) else \"false\"\
+          ,\n        \"rejection_reason\": rejection_reason,\n        \"logistics_status\"\
+          : logistics_status,\n        \"refund_amount\": \"退款金额将按原支付方式返回\",\n   \
+          \     \"estimated_refund_days\": \"3\"\n    }"
+        code_language: python3
+        outputs:
+          eligible:
+            children: null
+            type: string
+          estimated_refund_days:
+            children: null
+            type: string
+          logistics_status:
+            children: null
+            type: string
+          refund_amount:
+            children: null
+            type: string
+          rejection_reason:
+            children: null
+            type: string
+          simulated_order_data:
+            children: null
+            type: string
+        selected: false
+        title: 代码执行（模拟生成订单售后数据）
+        type: code
+        variables:
+        - value_selector:
+          - conversation
+          - refund_order_id
+          value_type: string
+          variable: order_id
+        - value_selector:
+          - conversation
+          - refund_reason
+          value_type: string
+          variable: refund_reason
+        - value_selector:
+          - '1784975306138'
+          - structured_output
+          - entities
+          - product_name
+          value_type: object
+          variable: product_name
+      height: 51
+      id: '1785227742518'
+      position:
+        x: 3052.4855131677405
+        y: 918.2696969696968
+      positionAbsolute:
+        x: 3052.4855131677405
+        y: 918.2696969696968
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: b5af87fe-63e7-4d51-874b-77ddeec6adaa
+          role: system
+          text: '你是一名电商平台的售后客服"小退"。
+
+            当前售后系统暂时繁忙，无法立即查询订单状态。
+
+
+            ## 要求
+
+            1. 告知用户系统繁忙
+
+            2. 提供临时解决方案：请用户留下订单号和联系方式
+
+            3. 主动建议转人工客服
+
+            4. 使用"您"称呼，语气诚恳
+
+            5. 回复长度控制在 100 字以内
+
+
+            ## 错误信息（仅供内部参考）
+
+            错误类型：{{#1785226986121.error_type#}}
+
+            错误详情：{{#1785226986121.error_message#}}'
+        selected: false
+        title: LLM 兜底
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785227831607'
+      position:
+        x: 3034
+        y: 1173.0165793733902
+      positionAbsolute:
+        x: 3034
+        y: 1173.0165793733902
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: true
+          variable_selector:
+          - sys
+          - query
+        model:
+          completion_params:
+            temperature: 0.2
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 8de9f4a0-1a58-44af-9c9e-1daa674d0320
+          role: system
+          text: "你是一名电商平台的售后客服\"小退\"，专门处理符合退货条件的场景。\n\n## 角色定位\n- 使用\"您\"称呼用户，语气友好、专业、有温度\n\
+            - 回复长度严格控制在 150 字以内\n- 全程基于以下变量提供的信息作答，禁止编造任何订单细节\n\n## 输入信息（严格基于以下变量，禁止自行推断）\n\
+            - 是否可退：{{#1785227742518.eligible#}}\n- 物流状态：{{#1785227742518.logistics_status#}}\n\
+            - 退款金额说明：{{#1785227742518.refund_amount#}}   # 如 \"退款金额将按原支付方式返回\"\n-\
+            \ 预计退款天数：{{#1785227742518.estimated_refund_days#}}\n- 模拟订单数据：{{#1785227742518.simulated_order_data#}}\n\
+            - 用户原始诉求：{{#context#}}\n\n## 回复必须包含的要素\n1. **确认符合退货条件**：明确告知\"您的订单符合7天无理由退货条件\"\
+            \n2. **退款金额说明**：直接引用 refund_amount 字段的原话\n   ⚠️ 禁止自行计算、编造或修改金额表述\n   ✅\
+            \ 正确：\"退款金额将**按原支付方式返回**\"\n   ❌ 禁止：\"将为您退款1999.0元\"、\"退款1999元\"\n3. **退款时效**：引用\
+            \ estimated_refund_days，表述为\"仓库收货并验收无误后，预计 **{estimated_refund_days} 天**内按原路退回\"\
+            \n4. **退货流程指引**（基于 simulated_order_data 中的 refund_reason 判断）：\n   - 若为\"\
+            质量问题\"：主动告知\"我们将为您安排**免费上门取件**\"\n   - 若为\"不想要了\"：告知\"请您自行寄回，**运费由您承担**\"\
+            \n   - 其他/未明确：告知\"请您申请退货并寄回商品，运费由您承担\"\n5. **商品完好提醒**：\"请确保商品本身、配件、吊牌、商标标识齐全，不影响二次销售\"\
+            \n\n## 合规红线（严格遵守）\n- ❌ 禁止说\"所有商品都能退\"、\"保证能退\"、\"100%可退\"\n- ❌ 禁止承诺\"\
+            立刻退款\"、\"马上到账\"、\"24小时到账\"\n- ❌ 禁止说\"7天内都可退\"（必须加限定条件）\n- ❌ 禁止自行编造具体金额数字\n\
+            - ❌ 禁止在未看到 refund_reason 为\"质量问题\"时预设上门取件\n- ✅ 正确表述：\"您的订单符合7天无理由退货条件，退款金额将**按原支付方式返回**，仓库验收后预计\
+            \ **3 天**内退回\"\n\n## 关键信息加粗\n- \"按原支付方式返回\"\n- 退款时效天数\n- \"上门取件\"（质量问题时）\n\
+            - \"运费自理\"（不想要了时）\n\n## 输出要求\n直接输出回复文本，不要包含任何解释、前缀或后缀标记。"
+        - id: 9e4cdf0c-5ff7-410f-8bb8-14fd976cd599
+          role: user
+          text: '用户退货原因：{{#conversation.refund_reason#}}
+
+            用户订单号：{{#conversation.refund_order_id#}}'
+        selected: false
+        title: LLM 退货成功
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785227857167'
+      position:
+        x: 3725.6387327578364
+        y: 825.350078385288
+      positionAbsolute:
+        x: 3725.6387327578364
+        y: 825.350078385288
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 0c011f2e-23a3-484d-ba5e-3dda080fb444
+            numberVarType: variable
+            value: 'true'
+            varType: string
+            variable_selector:
+            - '1785227742518'
+            - eligible
+          id: 'true'
+          logical_operator: and
+        selected: false
+        title: 条件分支 5
+        type: if-else
+      height: 147
+      id: '1785228219759'
+      position:
+        x: 3389.3500967269565
+        y: 913.4666666666665
+      positionAbsolute:
+        x: 3389.3500967269565
+        y: 913.4666666666665
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: ddd3887e-1693-43a8-a134-4f039d97eeac
+          role: system
+          text: "你是一名电商平台的售后客服\"小退\"，专门处理用户的退货申请被系统判定为不符合条件的场景。\n\n## 角色定位\n- 使用\"\
+            您\"称呼用户，语气诚恳、有同理心但不卑不亢\n- 回复长度严格控制在 120 字以内\n- 全程基于以下变量提供的信息作答，禁止编造任何订单细节\n\
+            \n## 输入信息（严格基于以下变量，禁止自行推断）\n- 是否可退：{{#1785227742518.eligible#}}   # 值为\
+            \ \"true\" 或 \"false\"\n- 物流状态：{{#1785227742518.logistics_status#}}  \
+            \ # \"transporting\" 或 \"delivered\"\n- 退货被拒原因：{{#1785227742518.rejection_reason#}}\n\
+            - 模拟订单数据：{{#1785227742518.simulated_order_data#}}\n- 用户原始诉求：{{#sys.query#}}\n\
+            \n## 逻辑判断（基于 eligible 和 logistics_status）\n-【当 eligible == \"false\" 时的话术分支】\n\
+            \n情况1：{{#1785227742518.logistics_status#}}== \"transporting\"（运输中）\n→\
+            \ 标准话术：\"很抱歉，您的订单目前运输中，尚未签收。我们可以为您安排拦截退款，\n  或者等签收后若有问题再申请7天无理由退货，您看哪种方式？\"\
+            \n→ 禁止说\"超过7天\"、\"不符合退货条件\"（逻辑错误）\n→ 替代方案：拦截退款 / 换货\n\n情况2：{{#1785227742518.logistics_status#}}\
+            \ == \"delivered\" 且 not within_7days（已签收超7天）\n→ 标准话术：\"很抱歉，您的订单已于{sign_date}签收，距今已超过7天无理由退货期限，\n\
+            \  无法办理退货。我们可以为您提供换货或维修服务，您看是否需要？\"\n→ 禁止说\"暂不支持退货\"（暗示未来可办）\n→ 必须说\"\
+            无法办理退货\"\n→ 替代方案：换货 \n\n- 当 eligible == \"false\" 且 logistics_status ==\
+            \ \"delivered\" 时：\n  → 明确说\"您的订单已超过7天无理由退货期限，无法办理退货\"\n  → 可引用 rejection_reason\
+            \ 中提到的签收日期\n- 当 eligible == \"true\" 时：\n  → 此节点不应被触发（应在工作流条件分支中路由到正常退款节点）\n\
+            \n## 回复必须包含的三要素（缺一不可）\n1. **显性拒绝**：必须明确说\"无法办理退货\"或\"不可退货\"\n2. **具体原因**：直接引用“退货被拒原因”的内容\n\
+            3. **替代方案**：提供换货或维修\n\n## 合规红线（严格遵守，违反即视为严重错误）\n- ❌ 禁止说\"7天内可退\"、\"7天内都能退\"\
+            、\"签收后7天内可申请无理由退货\"\n- ❌ 禁止承诺\"立刻退款\"、\"马上到账\"、\"24小时处理\"、\"将为您退款XXX元\"\
+            \n- ❌ 禁止用\"暂不支持\"等暗示未来可支持的措辞（必须说\"不可退货\"或\"无法办理退货\"）\n- ❌ 当 logistics_status\
+            \ == \"transporting\" 时，禁止提及任何签收日期\n- ❌ 禁止虚构任何流程状态（如\"已收到申请\"、\"已提交\"\
+            ）\n- ✅ 正确表述示例：\"很抱歉，您的订单目前运输中，不可办理退货。我们可以为您提供换货或维修服务，您看是否需要？\"\n\n## 转人工规则（严格控制）\n\
+            - 仅在以下情况主动建议转人工：\n  (a) 用户明确说\"转人工\"、\"找人工客服\"\n  (b) 用户情绪极度激动且替代方案无法安抚\n\
+            - 以下情况【禁止】转人工，必须由你在线闭环处理\n\n## 输出要求\n直接输出回复文本，不要包含任何解释、前缀或后缀标记。"
+        selected: false
+        title: LLM 退货失败
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785228477308'
+      position:
+        x: 3725.6387327578364
+        y: 1003.126413528688
+      positionAbsolute:
+        x: 3725.6387327578364
+        y: 1003.126413528688
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\ndef main(success_text: str, fallback_text: str, error_text: str)\
+          \ -> dict:\n    # 优先级：成功分支 > 不符合条件分支 > 错误兜底分支\n    final_reply = \"\"\n\
+          \    if success_text:\n        final_reply = success_text\n    elif fallback_text:\n\
+          \        final_reply = fallback_text\n    elif error_text:\n        final_reply\
+          \ = error_text\n    \n    if not final_reply:\n        final_reply = \"\
+          抱歉，退货申请处理出现问题，正在为您转接人工客服...\"\n    \n    return {\n        \"final_reply\"\
+          : final_reply,\n        \"structured_message\": {\n            \"role\"\
+          : \"assistant\",\n            \"content\": final_reply\n        }\n    }"
+        code_language: python3
+        outputs:
+          final_reply:
+            children: null
+            type: string
+          structured_message:
+            children: null
+            type: object
+        selected: false
+        title: 归一化 3
+        type: code
+        variables:
+        - value_selector:
+          - '1785227857167'
+          - text
+          value_type: string
+          variable: success_text
+        - value_selector:
+          - '1785228477308'
+          - text
+          value_type: string
+          variable: fallback_text
+        - value_selector:
+          - '1785227831607'
+          - text
+          value_type: string
+          variable: error_text
+      height: 51
+      id: '1785228866975'
+      position:
+        x: 4080
+        y: 1164.9277881171822
+      positionAbsolute:
+        x: 4080
+        y: 1164.9277881171822
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1785228866975'
+          - structured_message
+          variable_selector:
+          - conversation
+          - conversation_history
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - conversation
+          - turn_count
+        - input_type: constant
+          operation: set
+          value: completed
+          variable_selector:
+          - conversation
+          - refund_step
+        selected: false
+        title: 变量赋值 6
+        type: assigner
+        version: '2'
+      height: 135
+      id: '1785229253605'
+      position:
+        x: 4456.164689707773
+        y: 1164.9277881171822
+      positionAbsolute:
+        x: 4456.164689707773
+        y: 1164.9277881171822
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        instruction: "你是一个电商客诉的参数提取引擎。从用户输入中提取投诉相关结构化信息。\n\n## 提取规则\n1. complaint_type\
+          \ 必须标准化为以下枚举值之一：\n   - 物流问题（延迟、破损、送错、未送达）\n   - 质量问题（故障、缺陷、与描述不符）\n   -\
+          \ 服务态度（客服态度差、处理慢）\n   - 虚假宣传（广告与实际不符）\n   - 安全问题（健康损害、安全隐患）\n   - 其他\n \
+          \  未提及则为 null\n\n2. order_id：提取订单号（16-20位数字），未提及则为 null\n   当用户输入中出现\"它\"\
+          、\"这个订单\"等指代词，参考对话历史填充\n\n3. emotion_intensity 必须标准化为以下枚举值之一：\n   - low（平静陈述、理性投诉）\n\
+          \   - medium（不满、抱怨）\n   - high（愤怒、强烈不满、催促）\n   - critical（威胁曝光、法律诉讼、媒体曝光、人身安全）\n\
+          \   判断依据：用户用词激烈程度、感叹号数量、是否出现\"投诉你\"、\"曝光\"、\"律师\"、\"12315\"等关键词\n\n## 输出要求\n\
+          - 只输出符合 JSON Schema 的结构化数据\n- 未提及的字段必须显式输出 null\n- 不要输出任何解释性文字"
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        parameters:
+        - description: 投诉类型，枚举值：物流问题/质量问题/服务态度/虚假宣传/安全问题/其他
+          name: complaint_type
+          required: false
+          type: string
+        - description: 关联订单号，16-20位数字，未提及则为 null
+          name: order_id
+          required: false
+          type: string
+        - description: 情绪强度，枚举值：low/medium/high/critical
+          name: emotion_intensity
+          required: false
+          type: string
+        query:
+        - sys
+        - query
+        reasoning_mode: prompt
+        selected: false
+        title: 参数提取器 4
+        type: parameter-extractor
+        vision:
+          enabled: false
+      height: 87
+      id: '1785232499754'
+      position:
+        x: 1646
+        y: 1534.1530303030302
+      positionAbsolute:
+        x: 1646
+        y: 1534.1530303030302
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: constant
+          operation: set
+          value: initial
+          variable_selector:
+          - conversation
+          - complaint_step
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785232499754'
+          - complaint_type
+          variable_selector:
+          - conversation
+          - complaint_type
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1784975306138'
+          - structured_output
+          - intent
+          variable_selector:
+          - conversation
+          - current_intent
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1785232499754'
+          - order_id
+          variable_selector:
+          - conversation
+          - order_id
+        selected: false
+        title: 变量赋值  7
+        type: assigner
+        version: '2'
+      height: 161
+      id: '1785232770582'
+      position:
+        x: 1988
+        y: 1511.819696969697
+      positionAbsolute:
+        x: 1988
+        y: 1511.819696969697
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen3.6-flash
+          provider: langgenius/tongyi/tongyi
+        prompt_template:
+        - id: 6de353d4-2362-42c2-ad54-c7fc07127889
+          role: system
+          text: '你是一名电商平台的投诉分级引擎。基于用户的投诉内容，将其分级为 L1-L4。
+
+
+            ## 分级标准
+
+            - L1 轻微：物流延迟、包装破损、小瑕疵。用户情绪 low/medium
+
+            - L2 一般：质量问题、服务不及时、单次投诉。用户情绪 medium
+
+            - L3 严重：反复投诉、态度恶劣、虚假宣传、单次投诉未解决。用户情绪 high
+
+            - L4 紧急：安全问题（如使用后过敏）、法律威胁、媒体曝光、12315 威胁。用户情绪 critical
+
+
+            ## 分级依据
+
+            1. 投诉类型：{{#1785232499754.complaint_type#}}
+
+            2. 情绪强度：{{#1785232499754.emotion_intensity#}}
+
+            3. 投诉内容语义：{{#sys.query#}}
+
+            4. 是否涉及人身安全、法律风险、品牌声誉
+
+
+            ## 输出要求
+
+            只输出级别标记：L1 / L2 / L3 / L4 之一
+
+            不要输出其他内容。'
+        - id: e3403b4e-f530-4eae-bdae-886549150881
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: LLM 投诉分级
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785232938190'
+      position:
+        x: 2337.2937798339526
+        y: 1575.819696969697
+      positionAbsolute:
+        x: 2337.2937798339526
+        y: 1575.819696969697
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 428ba4fb-f2f4-47cd-91aa-fb0605a7aefc
+            value: L1
+            varType: string
+            variable_selector:
+            - '1785232938190'
+            - text
+          - comparison_operator: contains
+            id: c97eb435-3d7e-4729-8f2e-14cf8bd7ff35
+            value: L2
+            varType: string
+            variable_selector:
+            - '1785232938190'
+            - text
+          id: 'true'
+          logical_operator: or
+        selected: false
+        title: 条件分支 6
+        type: if-else
+      height: 149
+      id: '1785233726777'
+      position:
+        x: 2672
+        y: 1559.4863636363636
+      positionAbsolute:
+        x: 2672
+        y: 1559.4863636363636
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.2
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 4702139e-87e8-46a0-aadd-3775a56ec9f9
+          role: system
+          text: "你是一名电商平台的投诉处理客服\"小诉\"。\n用户投诉级别为 L1/L2（轻微/一般），请你代表平台处理。\n\n## 处理权限（必须严格遵守，不得越权）\n\
+            - 优惠券补偿：最高 10 元\n- 补发商品：可直接安排\n- 退换货：7 天内可自动通过\n- 运费：平台承担\n\n## 回复要求\n\
+            1. 首先真诚道歉，接住用户情绪\n2. 确认收到用户投诉问题\n2. 明确告知处理结果：\n   - 补偿方案（优惠券金额/补发/退换货）\n\
+            \   - 处理时效（如\"24小时内安排\"）\n3. 如果用户提供了订单号，引用订单号\n4. 使用\"您\"称呼\n5. 语气诚恳、温暖\n\
+            6. 回复长度控制在 120 字以内\n7. 末尾标注：【投诉级别:{{#1785232938190.text#}}| 处理方式：自动处理】\n\
+            \n## 用户投诉内容\n{{#sys.query#}}\n\n## 投诉类型\n{{#conversation.complaint_type#}}\n\
+            \n## 关联订单号\n{{#conversation.order_id#}}"
+        selected: false
+        title: LLM 自动处理
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785233831833'
+      position:
+        x: 3389.3500967269565
+        y: 1476.4938086406485
+      positionAbsolute:
+        x: 3389.3500967269565
+        y: 1476.4938086406485
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.1
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: 08d16107-10dd-45f6-acb4-c5ec23566552
+          role: system
+          text: "你是一名电商平台的投诉处理客服\"小诉\"。\n用户投诉级别为 L3/L4（严重/紧急），AI 不解决问题，只负责\"接住情绪+转交\"\
+            。\n\n## 处理规则\n1. 真诚道歉（比自动处理更郑重）\n2. 明确告知已升级至主管/总监\n3. 创建格式化紧急工单：URG-日期-序号（如\
+            \ URG-{{#1785667350728.current_time#}}-01）\n4. 按级别承诺响应时限：\n   - L3：4 小时内响应\n\
+            \   - L4：1 小时内响应\n5. 涉及人身安全的 L4 投诉，主动建议客户就医并保留证据\n6. 使用\"您\"称呼\n7. 语气极度诚恳、重视\n\
+            8. 回复长度控制在 150 字以内\n9. 末尾标注：【投诉级别：{{#1785232938190.text#}} | 处理方式：升级处理】\n\
+            \n## 用户投诉内容\n{{#sys.query#}}\n\n## 投诉类型\n{{#conversation.complaint_type#}}\n\
+            \n## 情绪强度\n{{#1785232499754.emotion_intensity#}}"
+        selected: false
+        title: LLM 升级处理
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785233833796'
+      position:
+        x: 3389.3500967269565
+        y: 1659.1625725452172
+      positionAbsolute:
+        x: 3389.3500967269565
+        y: 1659.1625725452172
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\ndef main(auto_text: str, escalate_text: str) -> dict:\n    # 同一时刻只有一条分支有内容，另一条为空，天然互斥\n\
+          \    final_reply = auto_text if auto_text else escalate_text\n    \n   \
+          \ if not final_reply:\n        final_reply = \"非常抱歉给您带来不便，正在为您转接人工客服专员...\"\
+          \n    \n    return {\n        \"final_reply\": final_reply,\n        \"\
+          structured_message\": {\n            \"role\": \"assistant\",\n        \
+          \    \"content\": final_reply\n        }\n    }"
+        code_language: python3
+        outputs:
+          final_reply:
+            children: null
+            type: string
+          structured_message:
+            children: null
+            type: object
+        selected: false
+        title: 归一化 4
+        type: code
+        variables:
+        - value_selector:
+          - '1785233831833'
+          - text
+          value_type: string
+          variable: auto_text
+        - value_selector:
+          - '1785233833796'
+          - text
+          value_type: string
+          variable: escalate_text
+      height: 51
+      id: '1785234111201'
+      position:
+        x: 4018
+        y: 1559.4863636363636
+      positionAbsolute:
+        x: 4018
+        y: 1559.4863636363636
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1785234111201'
+          - structured_message
+          variable_selector:
+          - conversation
+          - conversation_history
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - conversation
+          - turn_count
+        - input_type: constant
+          operation: set
+          value: handled
+          variable_selector:
+          - conversation
+          - complaint_step
+        selected: false
+        title: 变量赋值 8
+        type: assigner
+        version: '2'
+      height: 135
+      id: '1785234351741'
+      position:
+        x: 4380
+        y: 1594.882559695783
+      positionAbsolute:
+        x: 4380
+        y: 1594.882559695783
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: contains
+            id: 7470dfee-e6ef-4583-ab1e-0c5b4bf4a81a
+            value: L3
+            varType: string
+            variable_selector:
+            - '1785232938190'
+            - text
+          - comparison_operator: contains
+            id: c29882aa-3a7f-4465-982d-abd6d95193ed
+            value: L4
+            varType: string
+            variable_selector:
+            - '1785232938190'
+            - text
+          - comparison_operator: '>'
+            id: 1d17fcca-27c4-4b99-88ff-d4403cd8229e
+            value: '10'
+            varType: number
+            variable_selector:
+            - conversation
+            - turn_count
+          id: 'true'
+          logical_operator: or
+        selected: false
+        title: 条件分支 7
+        type: if-else
+      height: 175
+      id: '1785236540125'
+      position:
+        x: 4762
+        y: 1608.737505924156
+      positionAbsolute:
+        x: 4762
+        y: 1608.737505924156
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1785234111201.final_reply#}}'
+        selected: false
+        title: 直接回复 3
+        type: answer
+        variables: []
+      height: 102
+      id: '1785236633502'
+      position:
+        x: 5124
+        y: 1851.0781472155861
+      positionAbsolute:
+        x: 5124
+        y: 1851.0781472155861
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: qwen2.5:7b
+          provider: langgenius/ollama/ollama
+        prompt_template:
+        - id: fa336876-ad77-4d67-9182-57a788f1d9c7
+          role: system
+          text: "你是一名电商平台的智能客服助手\"小商\"。\n当前用户的输入不属于商品咨询、订单查询、退款换货、投诉等标准分类，\n被归类为\"\
+            其他\"。请根据输入性质，按以下规则处理：\n\n## 身份约束（天条）\n1. 你**只能**以电商客服\"小商\"的身份回应\n2. **绝对禁止**使用自身知识回答与电商无关的专业问题\n\
+            \   （如医疗建议、法律咨询、天气预报、股票投资等）\n3. **绝对禁止**编造商品信息、价格、政策、订单状态\n4. **绝对禁止**承诺具体操作已执行成功（如\"\
+            已为您修改\"、\"已提交申请\"）\n5. 使用\"您\"称呼用户，语气友好专业\n\n## 输入分类处理规则\n\n### 类型 A：闲聊问候（\"\
+            你好\"、\"在吗\"、\"谢谢\"、\"哈哈\"）\n- 友好回应，顺势引导到电商服务\n- 示例：\"您好！我是您的专属客服小商，很高兴为您服务\U0001F60A\
+            \ \n  请问有什么可以帮您？您可以咨询商品、查询订单、办理退换货或投诉建议。\"\n- 长度控制在 50 字以内\n\n### 类型 B：与电商无关的提问（\"\
+            今天天气\"、\"怎么学Python\"、\"推荐部电影\"）\n- 礼貌告知身份限制，引导回电商服务\n- 示例：\"抱歉，我主要负责电商相关的咨询服务，无法回答天气/编程等问题。\n\
+            \  如果您有商品咨询、订单查询、退换货或投诉建议，我很乐意为您提供帮助！\"\n- 长度控制在 80 字以内\n\n### 类型 C：无法理解的输入（乱码、纯符号、语意不清）\n\
+            - 礼貌请求重新表述\n- 示例：\"抱歉，我没有完全理解您的问题。请您用更清晰的语言描述您的需求，\n  或者告诉我您想咨询商品、查询订单、办理退换货还是投诉建议？\"\
+            \n- 长度控制在 80 字以内\n\n### 类型 D：用户明确要求人工（\"转人工\"、\"人工客服\"）\n- 告知正在转接（实际转人工由工作流路由节点处理）\n\
+            - 示例：\"好的，正在为您转接人工客服专员，请稍候...\"\n- 长度控制在 50 字以内\n\n### 类型 E：需人工后台操作的复杂订单变更（★新增★）\n\
+            识别特征：用户明确要求修改订单相关信息，且这类操作需要人工客服\n在后台系统中执行，智能客服无权直接处理。\n\n包括：\n- 修改收货地址（\"\
+            帮我改订单地址\"、\"修改收货地址\"、\"换收货地址\"）\n- 指定快递公司或配送方式（\"我要发顺丰\"、\"指定京东配送\"、\"\
+            要EMS\"）\n- 修改订单商品规格/颜色/数量（\"换个大一号\"、\"改成256G\"、\"换个颜色\"）\n- 修改收件人信息（姓名/电话）\n\
+            - 拆单/合单/修改订单备注\n\n处理规则（**三要素顺序不可颠倒**）：\n1. **先确认**：确认已收到用户的需求（若用户提供订单号，在复述中带上订单号）\n\
+            2. **再说明**：明确告知该操作需要人工客服在后台处理，智能客服暂时无法直接执行\n3. **后转接**：告知正在转接人工客服，专员会尽快处理\n\
+            \n标准话术模板：\n\"您好，已收到您[修改订单地址/指定快递/修改订单信息]的需求。该操作需要人工客服\n在后台系统中为您处理，智能客服暂时无法直接修改。正在为您转接人工客服，请稍候，\n\
+            我们的专员会尽快为您处理。\"\n\n若用户提供了订单号，话术中带入订单号：\n\"您好，已收到您修改订单 [订单号] 地址的需求。该操作需要人工客服在后台系统中\n\
+            为您处理，智能客服暂时无法直接修改。正在为您转接人工客服，请稍候，我们的专员\n会尽快为您处理。\"\n\n长度控制在 100 字以内。\n\
+            \n## 类型 E 的硬性禁止（防幻觉核心）\n- ❌ 禁止说\"已为您修改成功\"、\"已提交修改申请\"、\"已为您指定顺丰\"\n-\
+            \ ❌ 禁止承诺具体处理时间（如\"24小时内处理完毕\"、\"专员马上联系您\"）\n- ❌ 禁止编造后台操作流程、工单号或状态码\n-\
+            \ ❌ 禁止引导用户提供支付密码、短信验证码等敏感信息\n- ❌ 禁止加挽留话术（如\"还有什么我可以帮您\"）\n- ✅ 必须明确告知\"\
+            智能客服暂时无法直接处理\"\n- ✅ 必须告知\"正在转接人工客服\"\n- ✅ 语气礼貌、专业、让用户感到被重视\n\n## 对话历史使用规则\n\
+            {{#conversation.conversation_history#}}\n\n使用对话历史时遵循：\n1. 优先基于**用户当前输入**判断类型（特别是类型\
+            \ E 的复杂订单变更）\n2. 对话历史仅用于补全信息（如当前输入未带订单号，可从历史中获取）\n3. 当当前输入明确属于类型 E 时，直接按类型\
+            \ E 处理，**不要**因为历史中有\n   商品咨询/订单查询等内容而改变当前判断\n4. 不要在类型 E 的回复中引入对话历史里的商品参数、价格等细节，\n\
+            \   避免编造"
+        - id: 136c984d-82e0-46e4-b1b8-ae654f1c17c8
+          role: user
+          text: '{{#sys.query#}}'
+        selected: false
+        title: LLM 通用兜底
+        type: llm
+        vision:
+          enabled: false
+      height: 87
+      id: '1785237879861'
+      position:
+        x: 1988
+        y: 1949.3030303030303
+      positionAbsolute:
+        x: 1988
+        y: 1949.3030303030303
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: over-write
+          value:
+          - '1784975306138'
+          - structured_output
+          - intent
+          variable_selector:
+          - conversation
+          - current_intent
+        - input_type: constant
+          operation: set
+          value: initial
+          variable_selector:
+          - conversation
+          - other_step
+        - input_type: variable
+          operation: over-write
+          value:
+          - sys
+          - query
+          variable_selector:
+          - conversation
+          - last_query
+        selected: false
+        title: 变量赋值 9
+        type: assigner
+        version: '2'
+      height: 135
+      id: '1785237941740'
+      position:
+        x: 1646
+        y: 1902.6363636363635
+      positionAbsolute:
+        x: 1646
+        y: 1902.6363636363635
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\ndef main(reply_text: str) -> dict:\n    # 兜底保护：如果 LLM 输出为空，给一个安全的默认回复\n\
+          \    final_reply = reply_text if reply_text else \\\n        \"抱歉，我没有完全理解您的问题。请您用更清晰的语言描述您的需求，\"\
+          \ \\\n        \"或者告诉我您想咨询商品、查询订单、办理退换货还是投诉建议？\"\n    \n    return {\n  \
+          \      \"final_reply\": final_reply,\n        \"structured_message\": {\n\
+          \            \"role\": \"assistant\",\n            \"content\": final_reply\n\
+          \        }\n    }"
+        code_language: python3
+        outputs:
+          final_reply:
+            children: null
+            type: string
+          structured_message:
+            children: null
+            type: object
+        selected: false
+        title: 归一化 5
+        type: code
+        variables:
+        - value_selector:
+          - '1785237879861'
+          - text
+          value_type: string
+          variable: reply_text
+      height: 51
+      id: '1785305368919'
+      position:
+        x: 2330
+        y: 1981.9696969696968
+      positionAbsolute:
+        x: 2330
+        y: 1981.9696969696968
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        items:
+        - input_type: variable
+          operation: append
+          value:
+          - '1785305368919'
+          - structured_message
+          variable_selector:
+          - conversation
+          - conversation_history
+        - input_type: constant
+          operation: +=
+          value: 1
+          variable_selector:
+          - conversation
+          - turn_count
+        - input_type: constant
+          operation: set
+          value: responded
+          variable_selector:
+          - conversation
+          - other_step
+        selected: false
+        title: 变量赋值 10
+        type: assigner
+        version: '2'
+      height: 135
+      id: '1785305442325'
+      position:
+        x: 2672
+        y: 1948.6363636363635
+      positionAbsolute:
+        x: 2672
+        y: 1948.6363636363635
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: is
+            id: 2c4d8937-d639-4b57-9a2a-82bc43afe5f0
+            value: 'true'
+            varType: object
+            variable_selector:
+            - '1784975306138'
+            - structured_output
+            - need_human
+          - comparison_operator: '>'
+            id: 19f16d3a-3da1-4ac7-8773-ba70c26e41e9
+            value: '10'
+            varType: number
+            variable_selector:
+            - conversation
+            - turn_count
+          - comparison_operator: is
+            id: 133e170b-cd4a-4da2-ade9-1c89b34951c2
+            value: negative
+            varType: object
+            variable_selector:
+            - '1784975306138'
+            - structured_output
+            - sentiment
+          id: 'true'
+          logical_operator: or
+        selected: false
+        title: 条件分支 8
+        type: if-else
+      height: 223
+      id: '1785306285279'
+      position:
+        x: 3014
+        y: 1927.3030303030303
+      positionAbsolute:
+        x: 3014
+        y: 1927.3030303030303
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1785305368919.final_reply#}}非常理解您的需求，正在为您转接人工客服专员。
+
+          预计等待时间：3 分钟。
+
+          您的会话编号：{{#sys.conversation_id#}}'
+        selected: false
+        title: 直接回复 6
+        type: answer
+        variables: []
+      height: 153
+      id: '1785306409615'
+      position:
+        x: 3376
+        y: 1864.0166666666664
+      positionAbsolute:
+        x: 3376
+        y: 1864.0166666666664
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1785305368919.final_reply#}}'
+        selected: false
+        title: 直接回复 7
+        type: answer
+        variables: []
+      height: 102
+      id: '1785306438868'
+      position:
+        x: 3376
+        y: 2133.8142982770833
+      positionAbsolute:
+        x: 3376
+        y: 2133.8142982770833
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        code: "\nfrom datetime import datetime, timezone, timedelta\n\ndef main()\
+          \ -> dict:\n    # 强制东八区，避免服务器时区导致日期错位\n    tz = timezone(timedelta(hours=8))\n\
+          \    now = datetime.now(tz)\n    return {\n        \"current_time\": now.strftime(\"\
+          %Y-%m-%d %H:%M:%S\")\n    }\n"
+        code_language: python3
+        outputs:
+          current_time:
+            children: null
+            type: string
+        selected: false
+        title: get_time
+        type: code
+        variables: []
+      height: 51
+      id: '1785667350728'
+      position:
+        x: 3034
+        y: 1659.1625725452172
+      positionAbsolute:
+        x: 3034
+        y: 1659.1625725452172
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    viewport:
+      x: -605.7797705962123
+      y: -267.3624507087484
+      zoom: 0.4407956273228733
+  rag_pipeline_variables: []

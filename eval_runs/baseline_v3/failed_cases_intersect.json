@@ -1,0 +1,1145 @@
+{
+  "meta": {
+    "version": "v3",
+    "description": "V1∩V2 顽固失败用例，最高优先级",
+    "extracted": 43
+  },
+  "cases": [
+    {
+      "case_id": "TC-IF6-IF",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "快递延迟了两天还没到，我很着急",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1/L2→自动处理。注意：此用例在第二轮评测中因非确定性失败"
+    },
+    {
+      "case_id": "TC-BOUND-010",
+      "test_type": "boundary",
+      "category": "商品咨询与规则查询",
+      "difficulty": "困难",
+      "user_query": "4999元的商品需要本人签收吗",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "不需要",
+        "本人签收",
+        "5000"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": "4999元<5000元门槛",
+      "notes": "高价值边界：4999元→不需要本人签收"
+    },
+    {
+      "case_id": "TC-MULTI-002",
+      "test_type": "multi_turn",
+      "category": "商品咨询与规则查询",
+      "difficulty": "困难",
+      "user_query": "续航多久",
+      "conversation_context": [
+        {
+          "role": "user",
+          "content": "索尼WF-1000XM5蓝牙耳机"
+        },
+        {
+          "role": "assistant",
+          "content": "您好，索尼WF-1000XM5蓝牙耳机是一款优秀的降噪耳机..."
+        }
+      ],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "续航",
+        "30小时"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "多轮：指代消解（续航→上一轮商品）"
+    },
+    {
+      "case_id": "TC-PROHIB-001",
+      "test_type": "prohibited",
+      "category": "退款换货",
+      "difficulty": "中等",
+      "user_query": "退款多久到账",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "1-7",
+        "工作日"
+      ],
+      "must_not": [
+        "立刻退款",
+        "马上到账",
+        "100%退款成功",
+        "一定明天到货",
+        "保证3天送到"
+      ],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "禁止表述：退款时效类"
+    },
+    {
+      "case_id": "TC-PROHIB-005",
+      "test_type": "prohibited",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "什么时候发货",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "16:00",
+        "当日",
+        "次日"
+      ],
+      "must_not": [
+        "今天一定发货",
+        "春节照常发货",
+        "定制3天一定好",
+        "保证X号收到货",
+        "所有商品都是现货"
+      ],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "禁止表述：发货时效类"
+    },
+    {
+      "case_id": "TC-ADV-001",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "我要退钱还要曝光你们",
+      "conversation_context": [],
+      "expected_intent": "refund",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "对抗：退款+投诉混合→退款优先"
+    },
+    {
+      "case_id": "TC-CONV-P006-006",
+      "test_type": "single_turn",
+      "category": "商品咨询与规则查询",
+      "difficulty": "简单",
+      "user_query": "Apple AirPods Pro 2的参数是多少",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "降噪",
+        "通勤"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "知识库命中：蓝牙耳机类商品P006（变体查询）"
+    },
+    {
+      "case_id": "TC-RULE-004",
+      "test_type": "prohibited",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "预售商品什么时候发货",
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_answer_contains": [
+        "7-15",
+        "工作日",
+        "商品页"
+      ],
+      "must_not": [
+        "今天一定发货",
+        "一定提前发货",
+        "保证早于标注时间"
+      ],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "is_multi_turn": false,
+      "conversation_context": [],
+      "expected_if_else_path": [
+        "#3:ELSE"
+      ],
+      "expected_tool_calls": [],
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "重复用例，改为预售商品发货时效咨询→商品咨询与规则查询"
+    },
+    {
+      "case_id": "TC-RULE-007",
+      "test_type": "prohibited",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "退款多久到账",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "1-7",
+        "工作日"
+      ],
+      "must_not": [
+        "立刻退款",
+        "马上到账",
+        "100%退款成功"
+      ],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "规则咨询（含禁止表述）"
+    },
+    {
+      "case_id": "TC-RULE-010",
+      "test_type": "single_turn",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "订单能改地址吗",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "改地址",
+        "订单"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "规则咨询"
+    },
+    {
+      "case_id": "TC-RULE-017",
+      "test_type": "single_turn",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "商品有正品保障吗",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "正品",
+        "保障"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "规则咨询"
+    },
+    {
+      "case_id": "TC-RULE-018",
+      "test_type": "prohibited",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "怎么申请价格保护",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "价格保护",
+        "保价"
+      ],
+      "must_not": [
+        "一定补差价"
+      ],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "规则咨询（含禁止表述）"
+    },
+    {
+      "case_id": "TC-SHP-005",
+      "test_type": "boundary",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "4999元的商品需要本人签收吗",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "不需要",
+        "本人签收",
+        "5000"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": "4999元<5000元门槛",
+      "notes": "高价值边界：4999元→不需要本人签收"
+    },
+    {
+      "case_id": "TC-SHP-006",
+      "test_type": "boundary",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "5000元的商品需要本人签收吗",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "本人签收",
+        "5000"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": "5000元=高价值门槛",
+      "notes": "高价值边界：5000元→需要本人签收"
+    },
+    {
+      "case_id": "TC-SHP-007",
+      "test_type": "boundary",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "5001元的商品需要本人签收吗",
+      "conversation_context": [],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "本人签收",
+        "5000"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": "5001元>5000元门槛",
+      "notes": "高价值边界：5001元→需要本人签收"
+    },
+    {
+      "case_id": "TC-EXC-002",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "简单",
+      "user_query": "换一个颜色",
+      "conversation_context": [],
+      "expected_intent": "exchange",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "exchange映射到退款换货分支"
+    },
+    {
+      "case_id": "TC-EXC-003",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "简单",
+      "user_query": "换个型号",
+      "conversation_context": [],
+      "expected_intent": "exchange",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "exchange映射到退款换货分支"
+    },
+    {
+      "case_id": "TC-EXC-004",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "简单",
+      "user_query": "尺寸不对要换货",
+      "conversation_context": [],
+      "expected_intent": "exchange",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "exchange映射到退款换货分支"
+    },
+    {
+      "case_id": "TC-EXC-006",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "简单",
+      "user_query": "颜色发错了要换",
+      "conversation_context": [],
+      "expected_intent": "exchange",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "exchange映射到退款换货分支"
+    },
+    {
+      "case_id": "TC-RFD-ACT-001",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "中等",
+      "user_query": "帮我改订单地址 3178642857123452",
+      "conversation_context": [],
+      "expected_intent": "exchange",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [],
+      "expected_answer_contains": [
+        "改地址",
+        "订单"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "有订单号的改地址动作→退款换货（售后办理分支，由action_type=modify处理）"
+    },
+    {
+      "case_id": "TC-RFD-ACT-002",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "困难",
+      "user_query": "取消订单 3178642857123454",
+      "conversation_context": [],
+      "expected_intent": "refund",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:IF"
+      ],
+      "expected_answer_contains": [
+        "取消",
+        "订单"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [
+        "HTTP请求2"
+      ],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "有订单号的取消动作→退款换货"
+    },
+    {
+      "case_id": "TC-RFD-ACT-003",
+      "test_type": "single_turn",
+      "category": "退款换货",
+      "difficulty": "中等",
+      "user_query": "修改订单 3178642857123458",
+      "conversation_context": [],
+      "expected_intent": "exchange",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [],
+      "expected_human_handoff": false,
+      "expected_answer_contains": [
+        "修改订单",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "有订单号的修改订单动作→退款换货（售后办理分支，引导确认修改内容）"
+    },
+    {
+      "case_id": "TC-CMP-L1-001",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "快递延迟了两天还没到，我很着急",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-003",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "物流太慢了",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-006",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "发货速度太慢",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-007",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "快递员态度一般",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-008",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "包装有划痕",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-009",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "物流信息不更新",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-011",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "商品外盒有压痕",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L1-012",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "配送时间不合适",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "补偿"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L1→自动处理"
+    },
+    {
+      "case_id": "TC-CMP-L2-006",
+      "test_type": "single_turn",
+      "category": "投诉",
+      "difficulty": "中等",
+      "user_query": "投诉你们不回复我的消息",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "投诉"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L2",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#6 IF路径：L2→自动处理"
+    },
+    {
+      "case_id": "TC-OTH-OT-003",
+      "test_type": "adversarial",
+      "category": "其他",
+      "difficulty": "中等",
+      "user_query": "我今天胃不舒服吃什么药",
+      "conversation_context": [],
+      "expected_intent": "other",
+      "expected_branch": "其他",
+      "expected_if_else_path": [
+        "#8:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "电商",
+        "无法",
+        "客服"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "对抗：非电商问题"
+    },
+    {
+      "case_id": "TC-OTH-OT-013",
+      "test_type": "adversarial",
+      "category": "其他",
+      "difficulty": "中等",
+      "user_query": "帮我订机票",
+      "conversation_context": [],
+      "expected_intent": "other",
+      "expected_branch": "其他",
+      "expected_if_else_path": [
+        "#8:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "电商",
+        "无法",
+        "客服"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "对抗：非电商问题"
+    },
+    {
+      "case_id": "TC-OTH-HM-002",
+      "test_type": "single_turn",
+      "category": "其他",
+      "difficulty": "简单",
+      "user_query": "我要找人工客服",
+      "conversation_context": [],
+      "expected_intent": "other",
+      "expected_branch": "其他",
+      "expected_if_else_path": [
+        "#8:IF",
+        "#2:IF"
+      ],
+      "expected_answer_contains": [
+        "转接",
+        "人工"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": true,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "IF/ELSE#8 IF路径：need_human=true→转人工"
+    },
+    {
+      "case_id": "TC-BND-001",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "我要退钱还要曝光你们",
+      "conversation_context": [],
+      "expected_intent": "refund",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "退款+投诉混合→退款优先"
+    },
+    {
+      "case_id": "TC-BND-005",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "快递太慢了我要投诉还要退款",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "投诉"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "投诉优先于退款"
+    },
+    {
+      "case_id": "TC-BND-008",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "包裹丢了又没收到退款要投诉",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "投诉"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "投诉优先"
+    },
+    {
+      "case_id": "TC-BND-015",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "等了好久还没到要退款要投诉",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "投诉"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L1",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "投诉优先"
+    },
+    {
+      "case_id": "TC-BND-017",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "物流信息不对要查要投诉",
+      "conversation_context": [],
+      "expected_intent": "query_order",
+      "expected_branch": "订单查询",
+      "expected_if_else_path": [
+        "#1:ELSE"
+      ],
+      "expected_answer_contains": [
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "查物流优先"
+    },
+    {
+      "case_id": "TC-BND-018",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "你们的客服不专业要投诉要退款",
+      "conversation_context": [],
+      "expected_intent": "complaint",
+      "expected_branch": "投诉",
+      "expected_if_else_path": [
+        "#6:IF",
+        "#7:ELSE",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "投诉"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": "L2",
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "投诉优先"
+    },
+    {
+      "case_id": "TC-BND-020",
+      "test_type": "adversarial",
+      "category": "边界混淆",
+      "difficulty": "困难",
+      "user_query": "发错货了要换要投诉你们",
+      "conversation_context": [],
+      "expected_intent": "refund",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:ELSE"
+      ],
+      "expected_answer_contains": [
+        "抱歉",
+        "订单号"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": null,
+      "notes": "换货优先"
+    },
+    {
+      "case_id": "TC-MTL-001",
+      "test_type": "multi_turn",
+      "category": "商品咨询与规则查询",
+      "difficulty": "中等",
+      "user_query": "续航多久",
+      "conversation_context": [
+        {
+          "role": "user",
+          "content": "华为FreeBuds Pro 3"
+        },
+        {
+          "role": "assistant",
+          "content": "您好，华为FreeBuds Pro 3是一款优秀的蓝牙耳机..."
+        }
+      ],
+      "expected_intent": "consult",
+      "expected_branch": "商品咨询与规则查询",
+      "expected_if_else_path": [
+        "#3:IF",
+        "#2:ELSE"
+      ],
+      "expected_answer_contains": [
+        "续航",
+        "33小时"
+      ],
+      "must_not": [],
+      "expected_tool_calls": [],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": true,
+      "boundary_value": null,
+      "notes": "多轮：指代消解（续航→上一轮商品）"
+    },
+    {
+      "case_id": "TC-MTL-010",
+      "test_type": "multi_turn",
+      "category": "退款换货",
+      "difficulty": "中等",
+      "user_query": "那我要退货",
+      "conversation_context": [
+        {
+          "role": "user",
+          "content": "查订单 3178642857123454"
+        },
+        {
+          "role": "assistant",
+          "content": "您的订单3178642857123454状态为已签收，签收时间3天内。"
+        }
+      ],
+      "expected_intent": "refund",
+      "expected_branch": "退款换货",
+      "expected_if_else_path": [
+        "#4:IF",
+        "#5:IF"
+      ],
+      "expected_answer_contains": [
+        "退货",
+        "退款",
+        "7天"
+      ],
+      "must_not": [
+        "立刻退款",
+        "马上到账"
+      ],
+      "expected_tool_calls": [
+        "HTTP请求2",
+        "代码执行"
+      ],
+      "expected_complaint_level": null,
+      "expected_human_handoff": false,
+      "expected_retrieval_hit": null,
+      "boundary_value": "末位4→可退",
+      "notes": "多轮：查订单→转退货"
+    }
+  ]
+}

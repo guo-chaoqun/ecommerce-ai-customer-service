@@ -1,0 +1,343 @@
+{
+  "baseline_id": "baseline_v1",
+  "baseline_name": "电商客服 RAG 工作流 v1 基线",
+  "created_at": "2026-08-07T14:21:26+08:00",
+  "owner": "清禾纪/个人",
+  "description": "505 条全量评测基线，用于后续提示词/路由/知识库迭代的回归对比基准",
+  "git_commit": "（如评测代码在 git 中，填当前 commit hash；否则填 N/A）",
+
+  "eval_set": {
+    "name": "eval_set_v4",
+    "version": "4.0",
+    "total_cases": 505,
+    "file": "baseline_v1/eval_set_v4.json",
+    "distribution": {
+      "商品咨询": 281,
+      "订单查询": 36,
+      "退款换货": 70,
+      "投诉": 47,
+      "其他": 49,
+      "边界混淆": 22
+    },
+    "by_test_type": {
+      "single_turn": 382,
+      "multi_turn": 17,
+      "boundary": 35,
+      "prohibited": 23,
+      "adversarial": 48
+    },
+    "by_difficulty": {
+      "简单": 190,
+      "中等": 182,
+      "困难": 133
+    }
+  },
+
+  "knowledge_base": {
+    "kb_dataset_ids": [
+      "kh2mOJAMnGSpLQ2MrWp0MN/ylEI85LlpVu+U1mTwjLNpu192WH8AWcXdelZgjTQd",
+      "dLGf9zuwr+dgptkkif8VsbF+U7MqkTj1qUfTMFmDwlUi1G1G4sHKoD58fnou80DZ",
+      "mpXH/lGlm9hh4e7gzFXC8g4AJkOA3RFvxAyvjQZK5dHeKKw/IylloXNzqJVakj7R",
+      "ezzhTyhUaGW16nc69CbSGr/5f4MaZ3pNmpUHE8X3fv/DYsLx7a40WX0UmKSBL8VU",
+      "hDkItaG3vMxWbmDr4bE8H2lp2TDROAbCHWDAAAMv3dYnUz+x5RnIELrtHisHy5Mx"
+    ],
+    "kb_name": "电商平台商品与规则知识库（5 个数据集：50 商品/250QA + 17 规则文档）",
+    "version": "（在 Dify 知识库页面查看版本号或快照标识填入）",
+    "vector_model": "text-embedding-v1（langgenius/tongyi/tongyi）",
+    "rerank_model": "qwen3-rerank（langgenius/tongyi/tongyi）",
+    "rerank_enabled": false,
+    "rerank_note": "评测期间 qwen3-rerank 额度耗尽，rerank 实际未生效；配置为 weighted_score 模式但处于关闭状态",
+    "retrieval_mode": "multiple（多路检索/混合检索）",
+    "weight_type": "customized（自定义权重）",
+    "keyword_weight": 0.5,
+    "vector_weight": 0.5,
+    "top_k": 5,
+    "score_threshold": 0.5,
+    "score_threshold_enabled": true,
+    "chunking_strategy": "（在 Dify 知识库设置页查看分块策略填入，如 General / 父子分块 / Q&A 分块）",
+    "datasets_detail": {
+      "dataset_1": "商品知识库（50 商品 × 5 QA = 250 条）",
+      "dataset_2_to_5": "17 类规则文档（退换货/物流/支付/发票/签收/配送等）"
+    }
+  },
+
+  "model_config": {
+    "intent_recognition_llm": {
+      "node_title": "LLM 意图识别",
+      "node_id": "1784975306138",
+      "model": "qwen-max",
+      "provider": "langgenius/tongyi/tongyi（阿里云百炼）",
+      "temperature": 0.2,
+      "purpose": "意图识别 + 槽位提取（intent/product_name/order_id/issue_type/need_human/sentiment），输出 structured_output",
+      "note": "输出 intent 值被问题分类器作为输入变量（query_variable_selector 指向 1784975306138.structured_output.intent）"
+    },
+    "question_classifier": {
+      "node_title": "问题分类器",
+      "node_id": "1784979242299",
+      "model": "qwen3.7-plus",
+      "provider": "langgenius/tongyi/tongyi（阿里云百炼）",
+      "temperature": 0,
+      "purpose": "6 路分类（商品咨询/订单查询/退款换货/投诉/其他/边界混淆），决定工作流路由分支",
+      "input_variable": "1784975306138.structured_output.intent（LLM 意图识别的 intent 输出）",
+      "memory_window": 10,
+      "note": "分类器输入变量配置为上游 LLM 的 intent 字段，而非 sys.query —— 已识别为系统性问题根因"
+    },
+    "generation": {
+      "primary_model": "qwen2.5:7b",
+      "primary_provider": "langgenius/ollama/ollama（Ollama 本地部署）",
+      "nodes": [
+        {"node_title": "参数提取器(订单号)", "node_id": "1785053244582", "branch": "订单查询", "temperature": 0.7, "purpose": "提取订单号"},
+        {"node_title": "LLM 2", "branch": "订单查询", "temperature": 0.3, "purpose": "订单查询结果回复"},
+        {"node_title": "LLM 3", "branch": "订单查询", "temperature": 0.3, "purpose": "订单查询兜底回复"},
+        {"node_title": "通用LLM", "node_id": "1785063021374", "branch": "商品咨询(兜底)", "temperature": 0.1, "purpose": "知识库未命中时的兜底回复，输出固定话术"},
+        {"node_title": "参数提取器 2", "node_id": "1785151051500", "branch": "商品咨询", "temperature": 0.7, "purpose": "提取 product_name + consult_dimension"},
+        {"node_title": "LLM 润色", "node_id": "1785154507610", "branch": "商品咨询", "temperature": 0.3, "purpose": "基于知识库内容生成回复"},
+        {"node_title": "参数提取器 3", "branch": "退款换货", "temperature": 0.7, "purpose": "提取 order_id + refund_reason"},
+        {"node_title": "LLM 引导", "branch": "退款换货", "temperature": 0.7, "purpose": "引导用户提供退款所需信息"},
+        {"node_title": "LLM 兜底", "branch": "退款换货", "temperature": 0.2, "purpose": "退款流程兜底"},
+        {"node_title": "LLM 退货成功", "branch": "退款换货", "temperature": 0, "purpose": "退货成功回复"},
+        {"node_title": "LLM 退货失败", "branch": "退款换货", "temperature": 0.7, "purpose": "退货失败回复"},
+        {"node_title": "参数提取器 4", "branch": "投诉", "temperature": 0.7, "purpose": "提取投诉类型"},
+        {"node_title": "LLM 投诉分级", "model": "qwen3.6-flash", "provider": "langgenius/tongyi/tongyi", "branch": "投诉", "temperature": 0.1, "purpose": "投诉分级 L1-L4"},
+        {"node_title": "LLM 自动处理", "branch": "投诉", "temperature": 0.2, "purpose": "L1-L2 投诉自动处理回复"},
+        {"node_title": "LLM 升级处理", "branch": "投诉", "temperature": 0.7, "purpose": "L3-L4 投诉升级处理回复"},
+        {"node_title": "LLM 通用兜底", "branch": "其他", "temperature": 0.7, "purpose": "其他分支通用兜底回复"}
+      ],
+      "note": "除投诉分级使用 qwen3.6-flash 外，其余生成节点均使用 Ollama 本地 qwen2.5:7b；无显式 max_tokens/top_p 配置，使用 Dify 默认值"
+    },
+    "judge_model": {
+      "model": "qwen-plus",
+      "provider": "langgenius/tongyi/tongyi（阿里云百炼）",
+      "temperature": 0,
+      "response_format": "json_object",
+      "purpose": "自动评分（11 维度：意图/路由/相关性/完整性/忠实度/语气/边界/幻觉/违规/要点覆盖/转人工）",
+      "precheck_override": "代码层确定性预检覆盖裁判 must_not 和 expected_points 两个维度的误判"
+    }
+  },
+
+  "workflow_config": {
+    "app_name": "电商客服助手",
+    "app_mode": "advanced-chat",
+    "dsl_version": "0.6.0",
+    "dify_app_id": "（在 Dify 应用设置页查看 APP ID 填入）",
+    "dify_app_version": "（在 Dify 应用版本管理页查看版本号填入）",
+    "prompt_template_version": "v1.0",
+    "prompt_templates": {
+      "intent_classifier_llm": "baseline_v1/prompt_templates/intent_recognition.txt（LLM 意图识别 system prompt）",
+      "question_classifier": "baseline_v1/prompt_templates/question_classifier.txt（问题分类器 instruction + 6 label 定义）",
+      "商品咨询_llm_润色": "baseline_v1/prompt_templates/product_consult_polish.txt",
+      "商品咨询_兜底": "baseline_v1/prompt_templates/product_consult_fallback.txt",
+      "订单查询_llm": "baseline_v1/prompt_templates/order_query.txt",
+      "退款换货_llm": "baseline_v1/prompt_templates/refund.txt",
+      "投诉_llm": "baseline_v1/prompt_templates/complaint.txt",
+      "其他_llm": "baseline_v1/prompt_templates/other.txt"
+    },
+    "conversation_variables": [
+      {"name": "current_intent", "type": "string", "default": "", "purpose": "记录当前意图"},
+      {"name": "current_product", "type": "string", "default": "", "purpose": "记录用户当前问的商品"},
+      {"name": "current_dimension", "type": "string", "default": "", "purpose": "记录商品咨询维度"},
+      {"name": "order_id", "type": "string", "default": "", "purpose": "暂存用户订单号"},
+      {"name": "turn_count", "type": "integer", "default": 0, "purpose": "对话轮数计数，用于判断转人工"},
+      {"name": "conversation_history", "type": "array[object]", "default": [], "purpose": "存储对话历史，实现多轮记忆"},
+      {"name": "refund_step", "type": "string", "default": "initial", "purpose": "退款流程状态机"},
+      {"name": "refund_reason", "type": "string", "default": "", "purpose": "记录退款理由"},
+      {"name": "refund_order_id", "type": "string", "default": "", "purpose": "记录退款商品订单 ID"},
+      {"name": "complaint_step", "type": "string", "default": "initial", "purpose": "投诉状态机"},
+      {"name": "complaint_type", "type": "string", "default": "", "purpose": "投诉类型枚举"},
+      {"name": "other_step", "type": "string", "default": "", "purpose": "其他分支状态机"},
+      {"name": "last_query", "type": "string", "default": "", "purpose": "上一轮用户输入"},
+      {"name": "retrieval_query", "type": "string", "default": "", "purpose": "组建知识库检索文本"}
+    ],
+    "key_nodes": [
+      {"title": "LLM 意图识别", "id": "1784975306138", "type": "llm", "model": "qwen-max"},
+      {"title": "问题分类器", "id": "1784979242299", "type": "question-classifier", "model": "qwen3.7-plus"},
+      {"title": "参数提取器 2(商品咨询)", "id": "1785151051500", "type": "parameter-extractor", "model": "qwen2.5:7b"},
+      {"title": "变量赋值 3", "id": "1785152632360", "type": "assigner", "purpose": "写入 current_product + current_dimension"},
+      {"title": "模板转换", "id": "1785154209566", "type": "template-transform", "purpose": "拼接 product + dimension + query → 检索 query"},
+      {"title": "知识检索", "id": "1785153347805", "type": "knowledge-retrieval"},
+      {"title": "条件分支 3", "id": "1785154435162", "type": "if-else", "condition": "知识检索 result not empty → TRUE(润色) / FALSE(兜底)"},
+      {"title": "LLM 润色", "id": "1785154507610", "type": "llm", "model": "qwen2.5:7b", "purpose": "KB 命限时生成回复"},
+      {"title": "通用LLM", "id": "1785063021374", "type": "llm", "model": "qwen2.5:7b", "purpose": "KB 未命中时输出固定兜底话术"},
+      {"title": "归一化 2", "id": "17851570561020", "type": "code", "purpose": "consult_text 和 fallback_text 二选一"}
+    ],
+    "if_else_nodes": [
+      {"id": "1785134888171", "title": "条件分支 1", "branch": "订单查询", "purpose": "订单号是否有效"},
+      {"id": "1785066533456", "title": "条件分支 2", "branch": "退款换货", "purpose": "退款流程状态判断"},
+      {"id": "1785154435162", "title": "条件分支 3", "branch": "商品咨询", "purpose": "知识检索结果是否为空"},
+      {"id": "1785066533456_2", "title": "条件分支 4", "branch": "退款换货", "purpose": "退款步骤路由"},
+      {"id": "1785066533456_3", "title": "条件分支 5", "branch": "退款换货", "purpose": "退货成功/失败"},
+      {"id": "1785066533456_4", "title": "条件分支 6", "branch": "投诉", "purpose": "投诉分级 L1-L4 路由"},
+      {"id": "1785066533456_5", "title": "条件分支 7", "branch": "其他", "purpose": "其他分支状态机"},
+      {"id": "1785066533456_6", "title": "条件分支 8", "branch": "全局", "purpose": "turn_count 转人工阈值判断"}
+    ]
+  },
+
+  "results": {
+    "raw_result_csv": "baseline_v1/eval_results_20260807_142126.csv",
+    "raw_result_json": "baseline_v1/eval_results_20260807_142126.json",
+    "failed_cases": "baseline_v1/failed_cases_v1.json",
+    "total_cases": 505,
+    "passed_cases": 462,
+    "failed_cases_count": 43
+  },
+
+  "metrics": {
+    "overall": {
+      "intent_accuracy": 0.937,
+      "route_accuracy": 0.915,
+      "point_coverage": 0.871,
+      "hallucination_rate": 0.026,
+      "violation_rate": 0.008,
+      "avg_intent_score": 4.81,
+      "avg_route_score": 4.70,
+      "avg_relevance_score": 4.70,
+      "avg_completeness_score": 4.32,
+      "avg_faithfulness_score": 4.85,
+      "avg_tone_score": 4.93,
+      "avg_boundary_score": 4.82
+    },
+    "by_branch": {
+      "商品咨询": {"pass_rate": 0.954, "avg_score": 4.83, "total": 281, "passed": 268, "failed": 13},
+      "订单查询": {"pass_rate": 1.000, "avg_score": 5.00, "total": 36, "passed": 36, "failed": 0},
+      "退款换货": {"pass_rate": 0.871, "avg_score": 4.56, "total": 70, "passed": 61, "failed": 9},
+      "投诉": {"pass_rate": 0.787, "avg_score": 4.23, "total": 47, "passed": 37, "failed": 10},
+      "其他": {"pass_rate": 0.939, "avg_score": 4.69, "total": 49, "passed": 46, "failed": 3},
+      "边界混淆": {"pass_rate": 0.636, "avg_score": 3.95, "total": 22, "passed": 14, "failed": 8}
+    },
+    "by_test_type": {
+      "single_turn": {"pass_rate": 0.948, "total": 382, "failed": 20},
+      "multi_turn": {"pass_rate": 0.824, "total": 17, "failed": 3},
+      "boundary": {"pass_rate": 0.886, "total": 35, "failed": 4},
+      "prohibited": {"pass_rate": 0.739, "total": 23, "failed": 6},
+      "adversarial": {"pass_rate": 0.792, "total": 48, "failed": 10}
+    },
+    "by_difficulty": {
+      "简单": {"pass_rate": 0.968, "total": 190, "failed": 6},
+      "中等": {"pass_rate": 0.868, "total": 182, "failed": 24},
+      "困难": {"pass_rate": 0.902, "total": 133, "failed": 13}
+    }
+  },
+
+  "weak_branches": [
+    {
+      "branch": "边界混淆",
+      "pass_rate": 0.636,
+      "failed": 8,
+      "root_cause": "问题分类器对边界 case 存在首类偏好，路由决策树未硬化；部分边界用例（如 4999 元签收）知识检索语义匹配不足",
+      "optimization_plan": "分类器 label 描述加入路由决策树，明确边界 case 归属；优化知识检索 query 拼接策略",
+      "expected_improvement": "63.6% → 85%+"
+    },
+    {
+      "branch": "投诉",
+      "pass_rate": 0.787,
+      "failed": 10,
+      "root_cause": "投诉分支 LLM 提示词未强制'致歉+补偿'动作序列，仅机械索要订单号；投诉分级引擎(qwen3.6-flash)与处理 LLM(qwen2.5:7b) 之间状态传递不完整",
+      "optimization_plan": "硬化投诉 LLM 节点提示词，加入'致歉→确认→补偿/升级'动作框架约束",
+      "expected_improvement": "78.7% → 95%+"
+    },
+    {
+      "branch": "退款换货",
+      "pass_rate": 0.871,
+      "failed": 9,
+      "root_cause": "强规则（1-7 工作日退款、48 小时换货）未固化到 LLM 提示词；退款流程状态机在多轮场景下继承失败",
+      "optimization_plan": "LLM 节点前置平台规则库片段；强化 refund_step 状态机传递逻辑",
+      "expected_improvement": "87.1% → 95%+"
+    }
+  ],
+
+  "weak_test_types": [
+    {
+      "test_type": "prohibited",
+      "pass_rate": 0.739,
+      "failed": 6,
+      "root_cause": "LLM 节点未内置禁止表述清单，对'全国包邮''一定今天到'等禁止话术缺乏约束",
+      "optimization_plan": "在商品咨询/退款换货 LLM system prompt 中注入禁止表述清单"
+    },
+    {
+      "test_type": "adversarial",
+      "pass_rate": 0.792,
+      "failed": 10,
+      "root_cause": "对抗性输入（如假装客服、注入指令）未被分类器识别，直接进入业务分支",
+      "optimization_plan": "分类器增加对抗性输入检测规则，路由至其他/转人工分支"
+    },
+    {
+      "test_type": "multi_turn",
+      "pass_rate": 0.824,
+      "failed": 3,
+      "root_cause": "参数提取器(qwen2.5:7b)在多轮场景下无法从对话历史继承 product_name，导致知识检索 query 缺失商品名",
+      "optimization_plan": "修改参数提取器指令，增加'对话历史中已有商品则继承'规则；或考虑升级模型"
+    }
+  ],
+
+  "known_issues": [
+    "问题分类器输入变量配置为 LLM 意图识别的 intent 输出（而非 sys.query），导致分类器无法看到用户原始提问，这是 49.3% 商品咨询失败率的系统性根因之一",
+    "qwen3-rerank 额度耗尽，评测期间 rerank 实际未生效；关闭 rerank 后检索召回率下降",
+    "参数提取器(qwen2.5:7b)在多轮场景下商品实体继承失败（TC-MULTI-002），指令缺少'无指代词但历史有商品'的继承规则",
+    "TC-PROHIB-001/005 等用例出现幻觉（虚构订单号、虚构双十一延迟）",
+    "TC-BOUND-009 出现事实性幻觉（满 99 元运费 8 元，与免邮门槛矛盾）",
+    "TC-BOUND-010 知识检索语义匹配不足（4999 元签收 vs >5000 元需本人签收政策）",
+    "商品咨询兜底 LLM 的固定话术在知识库未命中时触发过于频繁，部分本应能回答的 query 因检索 query 拼接缺失商品名而误触兜底"
+  ],
+
+  "systemic_root_causes": [
+    {
+      "issue": "问题分类器输入变量错配",
+      "severity": "P0",
+      "description": "query_variable_selector 指向 1784975306138.structured_output.intent，而非 sys.query",
+      "impact": "分类器只能看到 intent 单词（如 'consult'），无法看到用户原始提问，所有分类规则失效",
+      "fix": "将问题分类器输入变量改为 sys.query"
+    },
+    {
+      "issue": "参数提取器模型能力不足",
+      "severity": "P1",
+      "description": "商品咨询参数提取器使用 qwen2.5:7b（Ollama 本地），多轮上下文推理能力有限",
+      "impact": "多轮场景下 product_name 提取失败 → 知识检索 query 缺失商品名 → 检索未命中 → 误触兜底",
+      "fix": "升级参数提取器模型为 qwen3.7-plus 或 qwen-max，或修改指令增加历史继承规则"
+    },
+    {
+      "issue": "知识检索 query 拼接依赖会话变量",
+      "severity": "P1",
+      "description": "模板转换节点拼接 product + dimension + query，其中 product 来自 conversation.current_product",
+      "impact": "当参数提取器未提取到 product_name 时，current_product 为空，检索 query 退化为纯 query 文本",
+      "fix": "在模板转换中增加 fallback 逻辑：当 current_product 为空时使用 sys.query 全文检索"
+    }
+  ],
+
+  "next_steps": [
+    {
+      "priority": "P0",
+      "action": "修复问题分类器输入变量：query_variable_selector 改为 sys.query",
+      "expected_impact": "分类器规则全部生效，预期商品咨询通过率 95.4% → 98%+，边界混淆 63.6% → 80%+"
+    },
+    {
+      "priority": "P0",
+      "action": "投诉分支提示词硬化：加入'致歉→确认问题→补偿/升级'动作框架",
+      "expected_impact": "投诉通过率 78.7% → 95%+"
+    },
+    {
+      "priority": "P1",
+      "action": "商品咨询/退款换货 LLM 节点前置平台规则库关键条款",
+      "expected_impact": "prohibited 通过率 73.9% → 90%+"
+    },
+    {
+      "priority": "P1",
+      "action": "参数提取器指令修改：增加'对话历史中已有商品则继承'规则",
+      "expected_impact": "multi_turn 通过率 82.4% → 95%+"
+    },
+    {
+      "priority": "P1",
+      "action": "分类器加路由决策树，明确边界 case 归属",
+      "expected_impact": "边界混淆 63.6% → 85%+"
+    },
+    {
+      "priority": "P2",
+      "action": "对抗性输入检测规则加入分类器",
+      "expected_impact": "adversarial 79.2% → 90%+"
+    },
+    {
+      "priority": "P2",
+      "action": "开通 qwen3-rerank 额度或更换 rerank 模型，启用知识检索 reranking",
+      "expected_impact": "商品咨询知识库命中率提升，兜底触发减少"
+    }
+  ]
+}

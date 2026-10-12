@@ -1,0 +1,32 @@
+{
+  "baseline_id": "baseline_v3_full",
+  "baseline_name": "P2+P3修复后全量评测",
+  "created_at": "2026-08-17 15:08:04",
+  "judge_model": "qwen-plus",
+  "eval_set": "eval_set_v4.json",
+  "eval_scope": "full eval_set_v4 (505 cases)",
+  "results": {
+    "total_cases": 505,
+    "passed_cases": 490,
+    "failed_cases": 15,
+    "pass_rate": 0.9702970297029703,
+    "passed_count": 490,
+    "failed_count": 15
+  },
+  "metrics": {
+    "overall": {
+      "route_accuracy": 0.9702970297029703,
+      "intent_accuracy": 4.77029702970297,
+      "point_coverage": 4.879207920792079,
+      "hallucination_rate": 0.02574257425742574,
+      "violation_rate": 0.0,
+      "avg_intent_score": 4.77029702970297,
+      "avg_route_score": 4.879207920792079,
+      "avg_relevance_score": 4.879207920792079,
+      "avg_completeness_score": 4.54059405940594,
+      "avg_faithfulness_score": 4.891089108910891,
+      "avg_tone_score": 4.98019801980198,
+      "avg_boundary_score": 4.859405940594059
+    }
+  }
+}

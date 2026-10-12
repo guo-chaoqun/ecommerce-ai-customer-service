@@ -1,0 +1,6 @@
+﻿test_id,optimization,group_a,group_b,metric,sample_size,duration,success_criteria
+AB-01,P1-1 知识检索 threshold 调优,threshold = 默认值,threshold = 0.5（政策查询）,信息完整性均值 + 整体通过率,505,1 天,信息完整性均值提升 >= 0.2，通过率提升 >= 3pp
+AB-02,P1-2 关键词权重调整,"keyword=0.3, vector=0.7","keyword=0.5, vector=0.5",边界用例通过率 + 信息完整性,505,1 天,边界用例通过率提升 >= 10pp
+AB-03,P1-4 LLM 信息完整性约束,当前 prompt,追加信息完整性约束 prompt,信息完整性均值 + 答案相关性,505,1 天,信息完整性均值提升 >= 0.15
+AB-04,P2-1 分类器关键词补充,当前分类器配置,补充关键词+边界示例+反例,意图准确率 + 分支路由准确率,505,1 天,分类器误路由减少 >= 50%
+AB-05,P3-1 防护指令（防幻觉）,当前 prompt,追加防护指令 prompt,幻觉率 + 忠实度,505,1 天,幻觉类失败减少 >= 60%
