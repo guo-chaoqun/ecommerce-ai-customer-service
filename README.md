@@ -200,6 +200,8 @@ ecommerce-ai-customer-service/
     └── test_cases_sample.json       用例样例 20 条（带字段注释）
 ```
 
+> **口径提示**：`eval_runs/` 是唯一的权威原始评测输出；`analysis/eval_output*/` 与 `analysis/notebooks/{charts,analysis_output}/` 是早期过程产物（内容与前者重复），仅供追溯，不作为结论依据。
+
 ## 🔎 如何查看与复现
 
 **推荐阅读顺序**（按理解成本递进）：
@@ -234,3 +236,5 @@ ecommerce-ai-customer-service/
 郭超群 ｜ 168314684@qq.com ｜ 求职方向：**大模型评测工程师 / AI 评测工程师**（全职 · 杭州）
 
 📄 [完整作品集（飞书）](https://xcnaaqfol96z.feishu.cn/docx/UDmldSWS2oKykaxUrUOcojobnwl) ｜ 🧠 [我的 AI 评测知识体系](https://github.com/guo-chaoqun/guo-chaoqun/blob/main/AI-EVAL-KNOWLEDGE.md)
+
+🧪 姊妹项目：[AI 穿搭导购 · 服饰 AIGC 评测与质量工程](https://github.com/guo-chaoqun/ai-stylist-advisor)（多模态侧的同套评测方法论）｜ 📚 [学习资料索引](https://github.com/guo-chaoqun/guo-chaoqun/blob/main/LEARNING-INDEX.md)
