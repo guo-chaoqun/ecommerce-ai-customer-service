@@ -1,4 +1,4 @@
-# 电商智能客服 · AI 评测体系从 0 到 1
+﻿# 电商智能客服 · AI 评测体系从 0 到 1
 
 > 这不是一个调 API 的项目，而是一套 **AI 效果验证体系**的完整实践：
 > 定义"答得好" → 出题考它 → 找到错因 → 证明改进是真的。
@@ -195,8 +195,7 @@ ecommerce-ai-customer-service/
 │   ├── notebooks/                   8 个分析笔记本（含运行输出）
 │   ├── analysis_output/             归因分析产出（失败用例/维度统计）
 │   ├── baselines/                   基线元数据
-│   ├── charts/                      全部可视化图表
-│   └── regression_sets/             黄金集回归用例
+│   └── charts/                      全部可视化图表
 └── evaluation/
     └── test_cases_sample.json       用例样例 20 条（带字段注释）
 ```
